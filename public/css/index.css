@@ -1,0 +1,14 @@
+.container{
+max-width: 100%;
+display: flex;
+
+}
+.signincontainer{
+
+max-width: 100%;
+display: inline-block;
+
+}
+input{
+margin: 0.5rem 0.5rem 0.5rem 0.5rem;
+}
