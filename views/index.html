@@ -3,61 +3,63 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Chat App</title>
 </head>
 <link rel="stylesheet" href="../public/css/index.css">
 <body>
 
 <div class="container">
 
-    <form action="" id="signinform" class="signincontainer">
+    <form  id="signinform" class="signincontainer">
     
         <div class="mb-3">
-            <label for="" class="form-label">Name</label>
+            <label for="name" class="form-label">Name</label>
             <input
                 type="text"
                 class="form-control"
                 name="name"
                 id="name"
-                aria-describedby="helpId"
-                placeholder=""
+                placeholder="Enter name"
+                required
             />
-            <small id="helpId" class="form-text text-muted">Enter your name here</small>
+            <!-- <small id="helpId" class="form-text text-muted">Enter your name here</small> -->
         </div>
         
         <div class="mb-3">
-            <label for="" class="form-label">Email</label>
+            <label for="email" class="form-label">Email</label>
             <input
                 type="email"
                 class="form-control"
                 name="email"
                 id="email"
-                aria-describedby="helpId"
-                placeholder=""
+                
+                placeholder="Enter Email"
+                required
             />
-            <small id="helpId" class="form-text text-muted">Help text</small>
+            <!-- <small id="helpId" class="form-text text-muted">Help text</small> -->
         </div>
             
         <div class="mb-3">
-            <label for="" class="form-label">Phone no</label>
+            <label for="phoneno" class="form-label">Phone no</label>
             <input
                 type="tel"
                 class="form-control"
                 name="phoneno"
                 id="phoneno"
-                aria-describedby="helpId"
-                placeholder=""
+               required
+                placeholder="Enter Phone no"
             />
-            <small id="helpId" class="form-text text-muted">Help text</small>
+            <!-- <small id="helpId" class="form-text text-muted">Help text</small> -->
         </div>
         <div class="mb-3">
-            <label for="" class="form-label">Password</label>
+            <label for="password" class="form-label">Password</label>
             <input
                 type="password"
                 class="form-control"
                 name="password"
                 id="password"
-                placeholder=""
+                placeholder="********"
+                required
             />
         </div>
         <button
@@ -69,6 +71,6 @@
         
     </form>
 </div>
-
+<script src="../public/js/index.js"></script>
 </body>
 </html>

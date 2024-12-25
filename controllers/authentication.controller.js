@@ -7,23 +7,30 @@ class Authentication {
   constructor() {
     this.createUser = async (req, res) => {
       const { name, email, phoneno, password } = req.body;
-     
+    
       try {
-        const checkEmail = UserService.checkUserExist(email);
-        if(!checkEmail){
-            return res.json({message:"Email already exist!"});
+        const emailExists = await UserService.checkUserExist(email);
+        if(emailExists){
+            return res.status(409).json({
+            stauts:"error",
+            message:"Email already exist!"});
         }
-        const newHashedPassword = PasswordService.encryptPassword(password,10);
-        const user = await User.create({
-          name,
-          email,
-          phoneno,
-          password:newHashedPassword,
+        const hashedPassword = await PasswordService.encryptPassword(password,10); 
+        const response = await UserService.createUser(name,email,phoneno,hashedPassword);
+        res.status(201).json({
+        status:"success",
+        message:"User created Successfully",
+        data:response.user,
         });
-        res.status(201).json(user);
+        
       } catch (error) {
-        res.status(500).json(error);
-      }
+        console.error("Error creating user:", error); // Log error for debugging
+        res.status(500).json({
+          status: "error",
+          message: "An internal server error occurred.",
+          error: error.message,
+      });
+    }
     };
   }
 }
