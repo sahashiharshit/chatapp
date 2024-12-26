@@ -1,3 +1,5 @@
+//main class to load pages according to requested page or authorized user
+
 class PageLoader {
   constructor(containerId) {
     this.mainContainer = document.getElementById(containerId);
@@ -6,7 +8,7 @@ class PageLoader {
       throw new Error(`Container with ID "${containerId}" not found.`);
     }
   }
-
+  //loadpage function to load pages
   async loadPage(page='signup.html') {
     try {
       const response = await fetch(`/${page}`);
@@ -28,20 +30,22 @@ class PageLoader {
     }
   }
 
+  //signup page functionality
   initSignupPage() {
     const signupForm = document.getElementById("signinform");
     if (!signupForm) {
       console.error("Signup form not found!");
       return;
     }
-    
+    //event listener to check signup submitted
     signupForm.addEventListener("submit", async (event) => {
       event.preventDefault();
       const name = document.getElementById("name")?.value.trim();
       const email = document.getElementById("email")?.value.trim();
       const phoneno = document.getElementById("phoneno")?.value.trim();
       const password = document.getElementById("password")?.value.trim();
-  
+      
+      
       try {
         const response = await fetch(
           "http://localhost:3000/chatapp/auth/create-new-user",
@@ -68,7 +72,7 @@ class PageLoader {
       
       // Load login page
     });
-
+    //login link listener
     const loginLink = document.getElementById("loginLink");
     if (!loginLink) {
       console.error("Login link not found!");
@@ -79,7 +83,7 @@ class PageLoader {
       this.loadPage("login.html"); // Load login page
     });
   }
-
+//function to check login form activities
   initLoginPage() {
     const loginForm = document.getElementById("loginForm");
     if (!loginForm) {
@@ -117,7 +121,7 @@ class PageLoader {
      
     });
     
-    
+    //register form link 
     const registerLink = document.getElementById("registerlink");
     if (!registerLink) {
       console.error("Sign up link not found!");
@@ -129,7 +133,7 @@ class PageLoader {
     });
   }
   
-  
+  //function for initialize chat window
   initChatWindow(){
   
     const userListContainer = document.getElementById('userList');
@@ -140,9 +144,9 @@ class PageLoader {
   
     sendBtn.addEventListener("click",async()=>{
     const message = chatInput.value.trim();
+    const userId = req.session.userId;
     if(message){
-    // this.appendMessage("You", message, chatmessagesContainer);
-    // chatInput.value="";
+    
     try {
       const response = await fetch("http://127.0.0.1:3000/chatapp/post/chat",{
         method: "POST",
@@ -158,17 +162,15 @@ class PageLoader {
     }
     });
     
-    setTimeout(()=>{
-    
-      this.appendMessage("Other User", "Hello",chatmessagesContainer);
-    },2000);
+   
   };
-  
+  //function to check loggedin users
   async fetchLoggedInUsers(container) {
     try {
       const response = await fetch("http://127.0.0.1:3000/chatapp/users");
-      const users = await response.json();
-      container.innerHTML = users.users
+      const data = await response.json();
+      const users= data.users;
+      container.innerHTML = users
         .map((user) => `<div class="user">${user.name}</div>`)
         .join("");
     } catch (error) {
@@ -176,7 +178,7 @@ class PageLoader {
       container.innerHTML = `<p>Could not load users.</p>`;
     }
   }
-
+//function to append messages in chat window
   appendMessage(sender, message, container) {
     const messageElement = document.createElement("div");
     messageElement.className = "message";
@@ -187,11 +189,36 @@ class PageLoader {
     container.scrollTop = container.scrollHeight;
   }
   
+  //function for checking sessions
+  
+  async checkSession() {
+    try {
+      const response = await fetch("http://127.0.0.1:3000/chatapp/check-session",{
+        method:"GET",
+        credentials:"include",
+      
+      });
+      
+      if(response.ok){
+      const data = await response.json();
+      console.log("Session is active:",data)
+      this.loadPage(data);
+      }
+      
+    } catch (error) {
+      
+    }
+  }
+  
+  
 }
 
    
 
 document.addEventListener('DOMContentLoaded',()=>{
+  
   const pageLoader = new PageLoader('main-container');
+  pageLoader.checkSession();
   pageLoader.loadPage();
+  
 });

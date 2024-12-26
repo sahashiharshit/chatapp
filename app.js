@@ -7,6 +7,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 import session from "express-session";
 import SequelizeStore from 'connect-session-sequelize';
+import { isAuthenticated } from "./middleware/authenticate.js";
 const app = express();
 const port = 3000;
 const privateKey = fs.readFileSync('private.pem', "utf-8");
@@ -30,7 +31,7 @@ session({
     },
 })
 );
-store.sync();
+store.sync({alter:true});
 app.use(express.json());
 app.use(
   cors({
@@ -42,6 +43,7 @@ app.use(
       }
     },
     methods: ["GET", "POST"],
+    credentials:true,
   })
 );
 app.use(express.static(path.join(__dirname, "public")));

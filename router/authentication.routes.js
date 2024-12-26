@@ -6,5 +6,6 @@ const authenticationRouter = Router();
 
 authenticationRouter.post('/create-new-user',authenticationController.createUser);
 authenticationRouter.post('/login',authenticationController.login);
-authenticationRouter.get('/users',isAuthenticated,authenticationController.getUsers);
+authenticationRouter.get('/users',authenticationController.getUsers);
+authenticationRouter.get('/check-session',authenticationController.checkSession);
 export default authenticationRouter;

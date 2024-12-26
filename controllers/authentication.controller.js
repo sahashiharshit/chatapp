@@ -4,6 +4,7 @@ import UserService from "../services/UserService.js";
 
 class Authentication {
   constructor() {
+  //function for create user and storing it in database
     this.createUser = async (req, res) => {
       const { name, email, phoneno, password } = req.body;
 
@@ -39,7 +40,7 @@ class Authentication {
         });
       }
     };
-
+  //function for login user and creating session
     this.login = async (req, res) => {
       const { email, password } = req.body;
 
@@ -82,6 +83,7 @@ class Authentication {
         });
       }
     };
+    //function for geting all users from data base and sending users info to frontend
     this.getUsers = async (req, res) => {
       try {
         const users = await UserService.getAllUsers();
@@ -98,6 +100,26 @@ class Authentication {
         });
       }
     };
+    //function to check sessions
+    this.checkSession = async(req,res)=>{
+    
+    if(req.session.userId){
+    
+    res.status(200).json({
+      
+      status:"success",
+      message:"User is logged in",
+      userId:req.session.userId,
+      name:req.session.name,
+    });
+    
+    }else{
+      res.status(401).json({
+        status: "error",
+        message: "Session not found or expired",
+      });
+    }
+    }
   }
 }
 export default new Authentication();
