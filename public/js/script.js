@@ -103,9 +103,10 @@ class PageLoader {
   
         if (response.ok) {
           alert("Login Successfull");
+          console.log(result.data);
           this.loadPage("login.html");
         } else {
-          alert(result.message || "Signup Failed");
+          alert(result.message || "login Failed");
         }
       } catch (error) {
         console.error("Error:", error);
