@@ -35,7 +35,15 @@ class UserService {
             throw new Error("Unable to create new User. Please try again");
         }
     }
-  
+  async getAllUsers(){
+    try {
+        const users = await User.findAll();
+        return users;
+    } catch (error) {
+        console.error("Error:",error);
+        throw new Error("Unable to find users. Please try agin")
+    }
+  }
 
 }
 

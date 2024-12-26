@@ -132,17 +132,29 @@ class PageLoader {
   
   initChatWindow(){
   
-    const userListContainer =document.getElementById('userList');
+    const userListContainer = document.getElementById('userList');
     const chatmessagesContainer = document.getElementById("chatMessages");
     const chatInput = document.getElementById("chatInput");
     const sendBtn = document.getElementById('sendBtn');
     this.fetchLoggedInUsers(userListContainer);
   
-    sendBtn.addEventListener("click",()=>{
+    sendBtn.addEventListener("click",async()=>{
     const message = chatInput.value.trim();
     if(message){
-    this.appendMessage("You", message, chatmessagesContainer);
-    chatInput.value="";
+    // this.appendMessage("You", message, chatmessagesContainer);
+    // chatInput.value="";
+    try {
+      const response = await fetch("http://127.0.0.1:3000/chatapp/post/chat",{
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ message,userId }),
+      });
+    } catch (error) {
+      console.error("Error:",error);
+    }
+    
     }
     });
     
@@ -156,7 +168,7 @@ class PageLoader {
     try {
       const response = await fetch("http://127.0.0.1:3000/chatapp/users");
       const users = await response.json();
-      container.innerHTML = users
+      container.innerHTML = users.users
         .map((user) => `<div class="user">${user.name}</div>`)
         .join("");
     } catch (error) {

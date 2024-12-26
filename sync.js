@@ -1,5 +1,7 @@
 import { sequelize } from "./config/database.js"
 import { User } from "./models/User.js";
+import { Chats } from "./models/Chats.js";
+
 (async()=>{
 
 try{
