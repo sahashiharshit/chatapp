@@ -19,6 +19,9 @@ class PageLoader {
       } else if (page === "login.html") {
         this.initLoginPage();
       }
+      else if(page==="chatpage.html"){
+        this.initChatWindow();
+      }
     } catch (error) {
       console.error("Error loading page:", error);
       this.mainContainer.innerHTML = `<p>Error loading page. Please try again later.</p>`;
@@ -99,12 +102,11 @@ class PageLoader {
             body: JSON.stringify({ email, password }),
           }
         );
-        const result = await response.json();
-  
+        
         if (response.ok) {
           alert("Login Successfull");
-          console.log(result.data);
-          this.loadPage("login.html");
+         
+          this.loadPage("chatpage.html");
         } else {
           alert(result.message || "login Failed");
         }
@@ -126,6 +128,53 @@ class PageLoader {
       this.loadPage("signup.html"); // Load login page
     });
   }
+  
+  
+  initChatWindow(){
+  
+    const userListContainer =document.getElementById('userList');
+    const chatmessagesContainer = document.getElementById("chatMessages");
+    const chatInput = document.getElementById("chatInput");
+    const sendBtn = document.getElementById('sendBtn');
+    this.fetchLoggedInUsers(userListContainer);
+  
+    sendBtn.addEventListener("click",()=>{
+    const message = chatInput.value.trim();
+    if(message){
+    this.appendMessage("You", message, chatmessagesContainer);
+    chatInput.value="";
+    }
+    });
+    
+    setTimeout(()=>{
+    
+      this.appendMessage("Other User", "Hello",chatmessagesContainer);
+    },2000);
+  };
+  
+  async fetchLoggedInUsers(container) {
+    try {
+      const response = await fetch("http://127.0.0.1:3000/chatapp/users");
+      const users = await response.json();
+      container.innerHTML = users
+        .map((user) => `<div class="user">${user.name}</div>`)
+        .join("");
+    } catch (error) {
+      console.error("Error fetching users:", error);
+      container.innerHTML = `<p>Could not load users.</p>`;
+    }
+  }
+
+  appendMessage(sender, message, container) {
+    const messageElement = document.createElement("div");
+    messageElement.className = "message";
+    messageElement.innerHTML = `<strong>${sender}:</strong> ${message}`;
+    container.appendChild(messageElement);
+
+    // Auto-scroll to the latest message
+    container.scrollTop = container.scrollHeight;
+  }
+  
 }
 
    

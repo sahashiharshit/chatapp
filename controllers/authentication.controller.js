@@ -43,6 +43,7 @@ class Authentication {
     
     
     this.login=async(req,res)=>{
+      let loggedInUsers = [];
       const {email,password} = req.body;
       
       try {
@@ -53,9 +54,10 @@ class Authentication {
          if(response){
          
           const token = JwtService.createJwtToken(user.dataValues.id);
-        
+          loggedInUsers.push(user.dataValues.name);
           return res.status(200).json({
-            data:token,
+            token:token,
+            data:loggedInUsers,
             status:'Success',
             message:'Password matched successfully',
           });
