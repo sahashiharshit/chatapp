@@ -13,7 +13,7 @@ const __dirname = path.dirname(__filename);
 app.use(express.json());
 app.use(cors({
     origin:(origin,callback)=>{
-        if(!origin||origin.startsWith('http://127.0.0.1')){
+        if(!origin||origin.startsWith('http://127.0.0.1:3000')){
         callback(null,true);
         }else{
             callback(new Error('Not allowed by CORS'));

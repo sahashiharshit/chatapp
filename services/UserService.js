@@ -1,4 +1,5 @@
 import { User } from "../models/User.js";
+import PasswordService from "./PasswordService.js";
 
 class UserService {
 
@@ -11,7 +12,7 @@ class UserService {
             },
             });
             //console.log(result);
-            return !!result;
+            return result;
         } catch (error) {
             console.error("Error checking user existence:", error);
             throw new Error("Unable to check user existence. Please try again later.");
@@ -34,6 +35,7 @@ class UserService {
             throw new Error("Unable to create new User. Please try again");
         }
     }
+  
 
 }
 

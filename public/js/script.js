@@ -113,6 +113,17 @@ class PageLoader {
       }
      
     });
+    
+    
+    const registerLink = document.getElementById("registerlink");
+    if (!registerLink) {
+      console.error("Sign up link not found!");
+      return;
+    }
+    registerLink.addEventListener("click", (event) => {
+      event.preventDefault();
+      this.loadPage("signup.html"); // Load login page
+    });
   }
 }
 

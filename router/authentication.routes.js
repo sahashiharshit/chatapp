@@ -4,5 +4,6 @@ import authenticationController from "../controllers/authentication.controller.j
 const authenticationRouter = Router();
 
 authenticationRouter.post('/create-new-user',authenticationController.createUser);
+authenticationRouter.post('/login',authenticationController.login);
 
 export default authenticationRouter;

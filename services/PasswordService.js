@@ -9,6 +9,16 @@
         console.error("Error hashing password:",error);
     }
     }
+    
+    async checkPassword(password,hashedPassword){
+        try{
+            return await bcrypt.compare(password,hashedPassword);
+        }catch(error){
+            console.error("Error checking password".error);
+            throw new Error(`Error in checking password`);
+        }
+    
+    }
  }
  
 export default new PasswordService();
