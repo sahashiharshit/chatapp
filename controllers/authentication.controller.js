@@ -1,7 +1,7 @@
 import JwtService from "../services/JwtService.js";
 import PasswordService from "../services/PasswordService.js";
 import UserService from "../services/UserService.js";
-
+import session from "express-session";
 class Authentication {
   constructor() {
   //function for create user and storing it in database
@@ -45,21 +45,21 @@ class Authentication {
       const { email, password } = req.body;
 
       try {
-        const user = await UserService.checkUserExist(email);
-        if (!!user) {
-          const hashedPassword = user.dataValues.password;
+        const userExist = await UserService.checkUserExist(email);
+        
+        if (!!userExist) {
+          const hashedPassword = userExist.dataValues.password;
           const response = await PasswordService.checkPassword(
             password,
             hashedPassword
           );
+          
           if (response) {
-            const token = JwtService.createJwtToken(user.dataValues.id);
-            const { id,name } = user.dataValues;
-              req.session.userId = id;
-              req.session.name = name;
+            const token = JwtService.createJwtToken(userExist.dataValues.id);
+            
               return res.status(200).json({
                 token: token,
-                
+                user:userExist,
                 status: "Success",
                 message: "Password matched successfully",
               });
@@ -101,25 +101,44 @@ class Authentication {
       }
     };
     //function to check sessions
-    this.checkSession = async(req,res)=>{
+    // this.checkSession = async(req,res)=>{
+    // console.log(req.session, req.session.user);
+    // if(req.session && req.session.user){
     
-    if(req.session.userId){
-    
-    res.status(200).json({
+    // res.status(200).json({
       
-      status:"success",
-      message:"User is logged in",
-      userId:req.session.userId,
-      name:req.session.name,
-    });
+    //   status:"success",
+    //   message:"User is logged in",
+    //   active:true,
+    //   sessionData:req.session.user,
+    // });
     
-    }else{
-      res.status(401).json({
-        status: "error",
-        message: "Session not found or expired",
-      });
+    // }else{
+    //   res.status(401).json({
+    //     status: "error",
+    //     active:false,
+    //     message: "Session not found or expired",
+    //   });
+    // }
+    // }
+    
+    this.logout = async(req,res)=>{
+    // if(req.session){
+    // req.session.destroy((err)=>{
+    //   if(err){
+    //   console.error('Failed to destroy session:',err);
+    //   res.status(500).json({ message: 'Failed to logout. Please try again.' });
+    //   }
+    //  else {
+    //   res.status(200).json({ message: 'Logout successful.' });
+    // }
+    // });
+    // }
+    // else {
+    //   res.status(200).json({ message: 'No active session to destroy.' });
+    // }
     }
-    }
+    
   }
 }
 export default new Authentication();

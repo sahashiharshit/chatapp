@@ -1,5 +1,11 @@
-
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sgin up</title>
+</head>
+<body>
 <h2>Register Yourself</h2>
 <form  id="signinform" class="signincontainer">
     
@@ -23,7 +29,6 @@
             class="form-control"
             name="email"
             id="email"
-            
             placeholder="Enter Email"
             required
         />
@@ -37,8 +42,8 @@
             class="form-control"
             name="phoneno"
             id="phoneno"
-           required
             placeholder="Enter Phone no"
+            required
         />
         <!-- <small id="helpId" class="form-text text-muted">Help text</small> -->
     </div>
@@ -55,10 +60,16 @@
     </div>
     <button
         type="submit"
-        class="btn btn-primary"
+        class="btn btn-primary" 
     >
         Submit
     </button>
     
+
+<p>Already have an account? <a href="index.html" id="loginlink" >Login</a></p>
 </form>
-<p>Already have an account? <a href="#" id="loginLink">Login</a></p>
+
+
+<script defer src="/js/signup.js"></script>
+</body>
+</html>

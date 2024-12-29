@@ -4,14 +4,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chat App</title>
-   
+    <link rel="stylesheet" href="/css/index.css"/>
+    <link rel="stylesheet" href="/css/login.css"/>
 </head>
-<link rel="stylesheet" href="/css/index.css">
-<link rel="stylesheet" href="/css/login.css">
+
 <body>
 
-<div id="main-container"></div>
+<div id="main-container">
+    <h2>Login</h2>
+    <form id="loginForm">
+      <label for="email">Email:</label>
+      <input type="text" id="email" name="email" required><br>
+      <label for="password">Password:</label>
+      <input type="password" id="password" name="password" required><br>
+      <button type="submit">Login</button>
+      <p>New to Chat app? <a href="signup.html" id="signuplink">Sign up</a></p>
+    </form>
+</div>
 
 <script defer src="/js/script.js"></script>
+
 </body>
 </html>

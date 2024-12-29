@@ -4,5 +4,6 @@ import chatstoreController from "../controllers/chatstore.controller.js";
 
 const chatsRouter = Router();
 
-chatsRouter.post('/chat',isAuthenticated,chatstoreController.storechat);
+chatsRouter.post('/sendmessage',chatstoreController.storechat);
+chatsRouter.get('/messages',chatstoreController.getMessages);
 export default chatsRouter;

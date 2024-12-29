@@ -5,6 +5,7 @@ import chatsRouter from "./chats.routes.js";
 const routes = Router();
 
 routes.use('/auth',authenticationRouter);
-routes.use('/',authenticationRouter);
-routes.use('/post',chatsRouter);
+
+routes.use('/chat',chatsRouter);
+
 export default routes;

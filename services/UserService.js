@@ -1,5 +1,5 @@
 import { User } from "../models/User.js";
-import PasswordService from "./PasswordService.js";
+
 
 class UserService {
 
@@ -11,7 +11,6 @@ class UserService {
                 email:email,
             },
             });
-            //console.log(result);
             return result;
         } catch (error) {
             console.error("Error checking user existence:", error);
@@ -35,11 +34,25 @@ class UserService {
             throw new Error("Unable to create new User. Please try again");
         }
     }
-  async getAllUsers(){
+  async getAllUsers(email){
     try {
-        const users = await User.findAll();
-        return users;
-    } catch (error) {
+        if(email){
+            const user = await User.findOne(
+            {where:{email:email}}
+            );
+            if (!user) {
+                throw new Error(`User with email ${email} not found`);
+            }
+            return user;
+        }else{
+            const users = await User.findAll();
+            return users;
+        
+        }
+    
+    
+    
+        } catch (error) {
         console.error("Error:",error);
         throw new Error("Unable to find users. Please try agin")
     }
