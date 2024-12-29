@@ -31,7 +31,7 @@ try{
     const response = await Chats.findAll({
     where:whereCondition,
     order:[['createdAt','ASC']],// Sort messages by creation time
-    limit:10,// Optionally, fetch only 10 messages at a time
+    //limit:10,// Optionally, fetch only 10 messages at a time
     });
     return response;
 

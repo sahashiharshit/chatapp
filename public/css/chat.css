@@ -18,7 +18,9 @@ body {
 	font-family: 'Roboto', sans-serif;
 	font-size: 16px;
 	background: var(--light-color);
-	margin: 20px;
+	margin: 0;
+	height: 100vh;
+	overflow: hidden;
 }
 
 ul {
@@ -43,15 +45,16 @@ a {
 .chat-container {
 	max-width: 1100px;
 	background: #fff;
-	margin: 30px auto;
-	overflow: hidden;
+	margin:0 auto;
+	height: 100vh;
+	display: flex;
+	flex-direction: column;
 }
 
 .chat-header {
 	background: var(--dark-color-a);
 	color: #fff;
-	border-top-left-radius: 5px;
-	border-top-right-radius: 5px;
+	
 	padding: 15px;
 	display: flex;
 	align-items: center;
@@ -61,13 +64,15 @@ a {
 .chat-main {
 	display: grid;
 	grid-template-columns: 1fr 3fr;
+	flex: 1;
+	overflow: hidden;
 }
 
 .chat-sidebar {
 	background: var(--dark-color-b);
 	color: #fff;
 	padding: 20px 20px 60px;
-	overflow-y: scroll;
+	overflow-y: auto;
 }
 
 .chat-sidebar h2 {
@@ -87,8 +92,8 @@ a {
 
 .chat-messages {
 	padding: 30px;
-	max-height: 500px;
-	overflow-y: scroll;
+	height: 100%;
+	overflow-y: auto;
 }
 
 .chat-messages .message {
