@@ -40,25 +40,26 @@ class Chat {
       
       this.messages = data;
      // console.log(this.messages);
-     const div = document.createElement('div');
-    div.classList.add('message');
+     document.querySelector('.chat-messages').innerHTML='';
+     
     
     this.messages.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt)).map(data=>{
-      const br = document.createElement('br');
-      div.appendChild(br);
-      const p = document.createElement('p');
-      p.classList.add('meta');
-      p.innerText = data.userId;
-      div.appendChild(p);
+      const div = document.createElement('div');
+      div.classList.add('message');
+      
+      // const p = document.createElement('p');
+      // p.classList.add('meta');
+      // //p.innerText = data.userId;
+      // div.appendChild(p);
       
       const para = document.createElement('p');
       para.classList.add('text');
       para.innerText = data.message;
       div.appendChild(para);
        
-     
+      document.querySelector('.chat-messages').appendChild(div);
     });
-    document.querySelector('.chat-messages').appendChild(div);
+    
      
     } catch (error) {
       console.error("Error fetching messages:", error);
@@ -83,12 +84,16 @@ class Chat {
 
       if (response.ok) {
         this.fetchMessages();
+        document.querySelector('#msg').value='';
       }
       console.log(this.messages);
     } catch (error) {
       console.error("Error sending message:", error);
     }
   }
+  
+  
+  //code to logout
   async logout() {
     try {
       const response = await fetch(
@@ -131,4 +136,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const message = e.target.elements.msg.value;
   chat.sendMessage(userId,message);
   });
+  
+  setInterval(()=>{
+    chat.fetchMessages();
+    
+  },2000);
 });
