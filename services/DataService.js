@@ -1,3 +1,4 @@
+import { Op } from "sequelize";
 import { Chats } from "../models/Chats.js";
 
 class DataService {
@@ -17,10 +18,21 @@ try{
 
 }
 
-async getAllMessages(){
+async getAllMessages(after,before){
 
 try{
-    const response = await Chats.findAll();
+    const whereCondition={};
+    if(after){
+    whereCondition.createdAt={[Op.gt]:new Date(after)};  // Filter messages created after the timestamp
+    }
+    if(before){
+    whereCondition.createdAt={[Op.lt]:new Date(before)};
+    }
+    const response = await Chats.findAll({
+    where:whereCondition,
+    order:[['createdAt','ASC']],// Sort messages by creation time
+    limit:10,// Optionally, fetch only 10 messages at a time
+    });
     return response;
 
 }catch(error){

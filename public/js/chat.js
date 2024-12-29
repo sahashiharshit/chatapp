@@ -31,16 +31,9 @@ class Chat {
       console.error("Error fetching users:", error);
     }
   }
-  async fetchMessages() {
-    try {
-      const response = await fetch(
-        "http://127.0.0.1:3000/chatapp/chat/messages"
-      );
-      const data = await response.json();
-      
-      this.messages = data;
-     // console.log(this.messages);
-     document.querySelector('.chat-messages').innerHTML='';
+  
+   displayMessages(){
+    document.querySelector('.chat-messages').innerHTML='';
      
     
     this.messages.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt)).map(data=>{
@@ -59,11 +52,96 @@ class Chat {
        
       document.querySelector('.chat-messages').appendChild(div);
     });
+  }
+  
+  //Function to fetch messages
+  async fetchMessages() {
+    try {
+    
+    
+      //Load messages from localstorage
+      const storedMessages = JSON.parse(localStorage.getItem('chatMessages')) || [];
+      this.messages = storedMessages;
+      //Display Stored messages
+      
+      this.displayMessages();
+    
+      //Fetch new messages from the backend
+      const lastMessage = this.messages[this.messages.length-1];
+      const lastTimestamp = lastMessage?lastMessage.createdAt:'';
+      
+      const response = await fetch(
+        `http://127.0.0.1:3000/chatapp/chat/messages?after=${encodeURIComponent(lastTimestamp)}`
+      );
+      if(!response.ok){
+        throw new Error("Failed to fetch Messages");
+      }
+      
+      const newMessages = await response.json();
+      
+      //update Messages and local storage
+      if(!Array.isArray(newMessages)){
+      throw new TypeError("newMessages is not iterable");
+      }
+      this.messages =[...this.messages,...newMessages];
+      this.trimOldMessages();
+      this.saveMessagesToLocal();
+      //Display all messages
+      this.displayMessages();
+      
+      
     
      
     } catch (error) {
       console.error("Error fetching messages:", error);
     }
+  }
+  
+  trimOldMessages(){
+  const maxMessages = 10;
+  if(this.messages.length>maxMessages){
+  this.messages =this.messages.slice(-maxMessages);
+  }
+  }
+  
+  saveMessagesToLocal(){
+  const recentMessages = this.messages.slice(-10);
+  localStorage.setItem('chatMessages',JSON.stringify(recentMessages));
+  }
+  
+  //Function to fetch old messages
+  
+  async fetchOlderMessages() {
+  try {
+    const firstMessage = this.messages[0];
+    const firstTimestamp = firstMessage?firstMessage.createdAt:'';
+    const response = await fetch(`http://127.0.0.1:3000/chatapp/chat/messages?before=${encodeURIComponent(firstTimestamp)}`);
+    
+    if (!response.ok) {
+      throw new Error("Failed to fetch older messages");
+    }
+
+    const olderMessages = await response.json();
+
+    if (!Array.isArray(olderMessages)) {
+      throw new TypeError("olderMessages is not iterable");
+    }
+
+    // Prepend older messages to the current list
+    this.messages = [...olderMessages, ...this.messages];
+
+    // Trim messages in localStorage
+    this.trimOldMessages();
+
+    // Save updated messages to localStorage
+    this.saveMessagesToLocal();
+
+    // Display all messages
+    this.displayMessages();
+  } catch (error) {
+    console.error("Error fetching older messages:", error);
+  }
+    
   }
   
   //function to send message to database
@@ -124,8 +202,6 @@ document.addEventListener("DOMContentLoaded", () => {
   chat.fetchUsers();
   chat.fetchMessages();
   
-  
- 
  }else{
  alert("Unauthorized user ");
  chat.navigate('login.html');
