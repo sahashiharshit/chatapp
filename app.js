@@ -1,7 +1,7 @@
 import express from "express";
 import cors from "cors";
 import fs from "fs";
-import { sequelize } from "./config/database.js";
+import { dbconnection } from "./config/database.js";
 import routes from "./router/index.js";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -90,7 +90,7 @@ app.use((err, req, res, next) => {
 //Start Server
 (async () => {
   try {
-    await sequelize.authenticate();
+    await dbconnection.authenticate();
     console.log("Database connected");
     app.listen(port, () => {
       console.log(`Server running on http://localhost:${port}`);

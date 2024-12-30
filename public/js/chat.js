@@ -2,7 +2,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const chatMessages = document.getElementById("chatMessages");
   let isLoading = false; // Prevent multiple concurrent loads
   let fetchInterval; // Reference to the setInterval
-  const FETCH_INTERVAL_MS = 2000; // Interval duration
+  const FETCH_INTERVAL_MS = 5000; // Interval duration
   class Chat {
     constructor() {
       this.users = [];

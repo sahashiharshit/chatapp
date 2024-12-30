@@ -1,4 +1,4 @@
-class SingUp{
+class SignUp{
 
     constructor(){
     
@@ -27,7 +27,7 @@ class SingUp{
 
           if (response.ok) {
             alert("Signup Successfull");
-            Login.navigate('index.html');
+            this.navigate('index.html');
           } else {
             alert(result.message || "Signup Failed");
           }
@@ -38,14 +38,14 @@ class SingUp{
       }
 }
 document.addEventListener('DOMContentLoaded',()=>{
- new SingUp();
+ const signup =new SignUp();
 document.getElementById('signinform').addEventListener('submit',(e)=>{
     e.preventDefault();
     const name = e.target.elements.name.value;
     const email =e.target.elements.email.value;
     const phoneno = e.target.elements.phoneno.value;
     const password = e.target.elements.password.value;
-    this.submitSignup(name,email,phoneno,password);
+    signup.submitSignup(name,email,phoneno,password);
   });
 
 });

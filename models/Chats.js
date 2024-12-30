@@ -1,5 +1,7 @@
 import { DataTypes, Model } from "sequelize";
-import { sequelize } from "../config/database.js";
+import { dbconnection } from "../config/database.js";
+import { Groups } from "./Groups.js";
+import { User } from "./User.js";
 export class Chats extends Model{
 }
 
@@ -11,22 +13,26 @@ Chats.init({
     allowNull:false,
     primaryKey:true,
     },
+    group_id:{
+    type:DataTypes.UUID,
+    allowNull:false,
+    references:{model:Groups,key:'id'},
+    },
     message:{
-    type:DataTypes.STRING,
+    type:DataTypes.TEXT,
     allowNull:false,
     },
-    userId: {
+    user_id: {
         type: DataTypes.UUID,
         allowNull: false,
         references: {
-          model: 'users', // Name of the table
+          model: User, // Name of the table
           key: 'id',      // Column in the referenced table
         },
-        onDelete: 'CASCADE', // Deletes posts if the associated user is deleted
-        onUpdate: 'CASCADE', // Updates posts if the user's id changes
-      },
+        },
 },{
-    sequelize,
+    sequelize:dbconnection,
     modelName:'Chats',
-    tableName:"chats"
+    tableName:"chats",
+    timestamps:true,
 });

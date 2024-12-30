@@ -1,11 +1,9 @@
-import { sequelize } from "./config/database.js"
-import { User } from "./models/User.js";
-import { Chats } from "./models/Chats.js";
-
+import { dbconnection } from "./config/database.js"
+import {User,GroupMembers,Groups,Chats} from './config/association.js';
 (async()=>{
 
 try{
-    await sequelize.sync({alter:true});
+    await dbconnection.sync({force:true});
     console.log('Database Synchronized');
 }catch(error){
     console.error('Unable to synchronize database:',error);
