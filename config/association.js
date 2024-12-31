@@ -9,6 +9,7 @@ User.hasMany(Groups,{foreignKey:'created_by',as:"createdGroups"});
 Groups.belongsToMany(User,{through:GroupMembers,foreignKey:"group_id", as: "members"});
 User.belongsToMany(Groups,{through:GroupMembers,foreignKey: "user_id", as: "groups"});
 
+
 Groups.hasMany(Chats,{foreignKey: "group_id", as: "messages"});
 Chats.belongsTo(Groups,{ foreignKey: "group_id" });
 

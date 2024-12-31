@@ -7,6 +7,6 @@ export const dbconnection = new Sequelize({
     username:'harshit',
     password:'4202',
     database:'chatdb',
-   
+    logging: console.log,
     
 });

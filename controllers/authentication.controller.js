@@ -100,43 +100,10 @@ class Authentication {
         });
       }
     };
-    //function to check sessions
-    // this.checkSession = async(req,res)=>{
-    // console.log(req.session, req.session.user);
-    // if(req.session && req.session.user){
-    
-    // res.status(200).json({
-      
-    //   status:"success",
-    //   message:"User is logged in",
-    //   active:true,
-    //   sessionData:req.session.user,
-    // });
-    
-    // }else{
-    //   res.status(401).json({
-    //     status: "error",
-    //     active:false,
-    //     message: "Session not found or expired",
-    //   });
-    // }
-    // }
+  
     
     this.logout = async(req,res)=>{
-    // if(req.session){
-    // req.session.destroy((err)=>{
-    //   if(err){
-    //   console.error('Failed to destroy session:',err);
-    //   res.status(500).json({ message: 'Failed to logout. Please try again.' });
-    //   }
-    //  else {
-    //   res.status(200).json({ message: 'Logout successful.' });
-    // }
-    // });
-    // }
-    // else {
-    //   res.status(200).json({ message: 'No active session to destroy.' });
-    // }
+    
     }
     
   }

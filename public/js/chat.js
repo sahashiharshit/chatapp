@@ -1,61 +1,107 @@
 document.addEventListener("DOMContentLoaded", () => {
-  const chatMessages = document.getElementById("chatMessages");
+  const chatMessages = document.querySelector(".chat-messages");
   let isLoading = false; // Prevent multiple concurrent loads
   let fetchInterval; // Reference to the setInterval
   const FETCH_INTERVAL_MS = 5000; // Interval duration
+
+  //class chat
   class Chat {
     constructor() {
       this.users = [];
       this.messages = [];
+      this.groups = [];
     }
     navigate(page) {
       window.location.href = page;
     }
-    async fetchUsers() {
+    //function to get Groups details of particular user
+    async getGroups(userId) {
       try {
         const response = await fetch(
-          "http://127.0.0.1:3000/chatapp/auth/users",
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
+          `http://127.0.0.1:3000/chatapp/groups/${userId}/groups`
         );
         const data = await response.json();
 
-        this.users = data.users;
-        const userlist = document.getElementById("users");
-        userlist.innerHTML = `
-         
-         ${this.users.map((user) => `<li>${user.name}</li>`).join("")}
-         `;
+        this.groups = data;
+
+        const grouplist = document.querySelector(".group-list");
+        grouplist.innerHTML = "";
+        this.groups.forEach((group) => {
+          const listitem = document.createElement("li");
+          listitem.classList.add("group-item");
+          listitem.textContent = group.groupname;
+          listitem.dataset.id = group.id;
+          listitem.addEventListener("click", (event) =>
+            this.showGroupMessage(group.id)
+          );
+          grouplist.appendChild(listitem);
+        });
       } catch (error) {
-        console.error("Error fetching users:", error);
+        console.log(error);
       }
     }
 
-    displayMessages(scrollToBottom = true) {
-      chatMessages.innerHTML = "";
+    async showGroupMessage(groupid) {
+      const msgBox = document.getElementById("msg");
+      msgBox.dataset.id = groupid;
+      const params = new URLSearchParams(window.location.search);
+      const userid = params.get("userId");
 
-      this.messages
+      try {
+        const response = await fetch(
+          `http://127.0.0.1:3000/chatapp/chat/messages?groupId=${groupid}&userId=${userid}`
+        );
+
+        const messages = await response.json();
+
+        this.messages = messages.messages;
+        this.displayMessages(true, userid);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+
+    //function to display messages
+    displayMessages(scrollToBottom = true, userid) {
+      chatMessages.innerHTML = "";
+    
+      if(this.messages.length==0){
+        const groupname = document.querySelector('.groupname');
+        groupname.innerHTML='';
+        chatMessages.innerHTML=`<p class='errornomsg'>No messages in the group yet</p>`;
+      }else{
+     
+        const groupname = document.querySelector('.groupname');
+        groupname.textContent=`${this.messages[0].Group.groupname}`
+        this.messages
         .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
         .map((data) => {
-          const div = document.createElement("div");
-          div.classList.add("message");
-
-          // const p = document.createElement('p');
-          // p.classList.add('meta');
-          // //p.innerText = data.userId;
-          // div.appendChild(p);
-
-          const para = document.createElement("p");
-          para.classList.add("text");
-          para.innerText = data.message;
-          div.appendChild(para);
-
-          chatMessages.appendChild(div);
-        });
+          const messageElement = document.createElement("div");
+          let date = new Date(data.createdAt);
+          let localtime = date.toLocaleString(undefined, {
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: true,
+          });
+          messageElement.classList.add(
+            "message",
+            data.user_id === userid ? "sent" : "received"
+          );
+          messageElement.innerHTML = `
+          <div class="username">${(data.sender.name).charAt(0).toUpperCase()}${(data.sender.name).slice(1)}</div>
+          <p>${data.message}</p>
+          <span class="timestamp">${localtime}</span>
+          
+          
+          `;
+          chatMessages.appendChild(messageElement);
+ 
+      
+      });
+    }
       if (scrollToBottom) {
         chatMessages.scrollTop = chatMessages.scrollHeight;
       }
@@ -63,16 +109,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
     //Function to fetch messages
     async fetchMessages() {
-    if(isLoading) return;
+      if (isLoading) return;
       try {
         //Load messages from localstorage
         const storedMessages =
           JSON.parse(localStorage.getItem("chatMessages")) || [];
         this.messages = storedMessages;
-        
-         // Check if the user is already at the bottom
-         const isAtBottom = chatMessages.scrollTop + chatMessages.clientHeight >= chatMessages.scrollHeight -50;
-         
+
+        // Check if the user is already at the bottom
+        const isAtBottom =
+          chatMessages.scrollTop + chatMessages.clientHeight >=
+          chatMessages.scrollHeight - 50;
+
         //Display Stored messages
         this.displayMessages(false);
 
@@ -112,14 +160,13 @@ document.addEventListener("DOMContentLoaded", () => {
       //   this.messages = this.messages.slice(-maxMessages);
       // }
     }
-
+    //saves messages in local storage
     saveMessagesToLocal() {
       //const recentMessages = this.messages.slice(-50);
       localStorage.setItem("chatMessages", JSON.stringify(this.messages));
     }
 
     //Function to fetch old messages
-
     async fetchOlderMessages() {
       if (isLoading) return;
       isLoading = true;
@@ -150,7 +197,7 @@ document.addEventListener("DOMContentLoaded", () => {
           isLoading = false;
           return;
         }
-       
+
         const oldScrollHeight = chatMessages.scrollHeight;
         // Prepend older messages to the current list
         this.messages = [...olderMessages, ...this.messages];
@@ -163,22 +210,21 @@ document.addEventListener("DOMContentLoaded", () => {
         // Adjust the scroll position to maintain the user's current view
         const newScrollHeight = chatMessages.scrollHeight;
         chatMessages.scrollTop = newScrollHeight - oldScrollHeight;
-        
       } catch (error) {
         console.error("Error fetching older messages:", error);
       } finally {
-        setTimeout(() => {
-          fetchInterval = setInterval(
-            () => this.fetchMessages(),
-            FETCH_INTERVAL_MS
-          );
-        }, FETCH_INTERVAL_MS);
+        // setTimeout(() => {
+        //   fetchInterval = setInterval(
+        //     () => this.fetchMessages(),
+        //     FETCH_INTERVAL_MS
+        //   );
+        // }, FETCH_INTERVAL_MS);
         isLoading = false;
       }
     }
 
     //function to send message to database
-    async sendMessage(userId, message) {
+    async sendMessage(groupId, userId, message) {
       if (!message.trim()) return;
 
       try {
@@ -189,15 +235,19 @@ document.addEventListener("DOMContentLoaded", () => {
             headers: {
               "Content-Type": "application/json",
             },
-            body: JSON.stringify({ userId: userId, message: message }),
+            body: JSON.stringify({
+              groupId: groupId,
+              userId: userId,
+              message: message,
+            }),
           }
         );
-
+        // console.log(await response.text());
         if (response.ok) {
-          this.fetchMessages(); // Refresh the messages after sending
+          this.showGroupMessage(groupId); // Refresh the messages after sending
           document.querySelector("#msg").value = ""; // Clear the message input
         }
-        console.log(this.messages);
+        //console.log(this.messages);
       } catch (error) {
         console.error("Error sending message:", error);
       }
@@ -216,6 +266,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (response.ok) {
           alert("Logout successful.");
+          localStorage.removeItem(`${userId}_data`);
           this.navigate("login.html");
         } else {
           alert("Failed to logout. Please try again.");
@@ -230,25 +281,29 @@ document.addEventListener("DOMContentLoaded", () => {
   const params = new URLSearchParams(window.location.search);
   const userId = params.get("userId");
   const data = localStorage.getItem(`${userId}_data`);
+  chat.getGroups(userId);
   if (data) {
-    chat.fetchUsers();
-    chat.fetchMessages();
+    //chat.fetchUsers();
+    //chat.fetchMessages();
     // Start fetching new messages periodically
-    fetchInterval = setInterval(() => chat.fetchMessages(), FETCH_INTERVAL_MS);
+    //fetchInterval = setInterval(() => chat.fetchMessages(), FETCH_INTERVAL_MS);
   } else {
     alert("Unauthorized user ");
+
     chat.navigate("login.html");
   }
-  document.getElementById("chat-form").addEventListener("submit", (e) => {
+  document.getElementById("sendmsg").addEventListener("submit", (e) => {
     e.preventDefault();
     const message = e.target.elements.msg.value;
-    chat.sendMessage(userId, message);
+    const groupId = e.target.elements.msg.dataset.id;
+
+    chat.sendMessage(groupId, userId, message);
   });
 
-  chatMessages.addEventListener("scroll", async () => {
-    console.log("scroll up");
-    if (chatMessages.scrollTop === 0) {
-      await chat.fetchOlderMessages();
-    }
-  });
+  // chatMessages.addEventListener("scroll", async () => {
+  //   console.log("scroll up");
+  //   if (chatMessages.scrollTop === 0) {
+  //     await chat.fetchOlderMessages();
+  //   }
+  // });
 });

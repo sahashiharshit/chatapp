@@ -17,7 +17,7 @@ User.init(
     email: {
       type: DataTypes.STRING,
       allowNull: false,
-      unique:true,
+      unique: true,
     },
     phoneno: {
       type: DataTypes.STRING,
@@ -29,9 +29,9 @@ User.init(
     },
   },
   {
-    sequelize:dbconnection,
+    sequelize: dbconnection,
     modelName: "User",
     tableName: "users",
-    timestamps:true,
+    timestamps: true,
   }
 );

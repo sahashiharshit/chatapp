@@ -1,3 +1,4 @@
+
 import { User } from "../models/User.js";
 
 
@@ -57,6 +58,7 @@ class UserService {
         throw new Error("Unable to find users. Please try agin")
     }
   }
+  
 
 }
 
