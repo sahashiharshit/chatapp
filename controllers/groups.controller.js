@@ -1,4 +1,5 @@
 import GroupService from "../services/GroupService.js";
+import UserService from "../services/UserService.js";
 
 
 class GroupsController{
@@ -42,7 +43,22 @@ constructor(){
         
         }
     }
+
+
+    this.searchUser= async(req,res)=>{
+        const {query,userId} = req.query;
+        try {
+            const users = await UserService.getUserByQuery(query,userId);
+            res.status(201).json(users);
+        } catch (error) {
+            res.status(500).json({ error: 'Failed to fetch participants' });
+        }
+    
+    }
+
 }
+
+
 
 }
 export default new GroupsController();

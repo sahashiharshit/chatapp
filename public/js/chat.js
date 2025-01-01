@@ -1,5 +1,16 @@
 document.addEventListener("DOMContentLoaded", () => {
   const chatMessages = document.querySelector(".chat-messages");
+
+  // Toggle Create Group Modal
+  const openCreateGroup = document.getElementById("open-create-group");
+  const closeCreateGroup = document.getElementById("close-create-group");
+  const createGroupContainer = document.getElementById(
+    "create-group-container"
+  );
+  const createGroupBtn = document.getElementById("create-group-btn");
+  const modalOverlay = document.getElementById("modal-overlay");
+  const participantsInput = document.getElementById("group-participants");
+  const participantsList = document.getElementById("participants-list");
   let isLoading = false; // Prevent multiple concurrent loads
   let fetchInterval; // Reference to the setInterval
   const FETCH_INTERVAL_MS = 5000; // Interval duration
@@ -296,11 +307,101 @@ document.addEventListener("DOMContentLoaded", () => {
 
     chat.sendMessage(groupId, userId, message);
   });
-
   // chatMessages.addEventListener("scroll", async () => {
   //   console.log("scroll up");
   //   if (chatMessages.scrollTop === 0) {
   //     await chat.fetchOlderMessages();
   //   }
   // });
+
+  
+  //To open and close popup
+  openCreateGroup.addEventListener("click", () => {
+ 
+    createGroupContainer.style.display = "flex";
+    modalOverlay.classList.remove("hidden");
+  });
+  closeCreateGroup.addEventListener("click", () => {
+
+    createGroupContainer.style.display = "none";
+    modalOverlay.classList.add("hidden");
+  });
+  //Ends here
+  
+  //
+  // Participants Logic
+  participantsInput.addEventListener("input", async(event) => {
+   const query =event.target.value;
+   if(query.length<2){
+   participantsList.innerHTML='';
+   
+   return;
+   }
+   try{
+   
+    const response = await fetch(`http://127.0.0.1:3000/chatapp/groups/search-participants?query=${encodeURIComponent(query)}&userId=${encodeURIComponent(userId)}`);
+   
+    
+    const participants = await response.json();
+    console.log(participants);
+    participantsList.innerHTML='';
+    
+    participants.map(participant=>{
+    
+    const div = document.createElement('div');
+    div.textContent= participant.name;
+    div.dataset.userId=participant.id;
+    div.classList.add('participant-item');
+    
+    div.addEventListener('click',()=>{
+    
+     addParticipantToList(participant);
+    });
+    participantsList.appendChild(div);
+    });
+    
+   }catch(error){
+    console.error("Error fetching participants:", error);
+   }
+   
+  });
+  
+  createGroupBtn.addEventListener("click", () => {
+    const groupName = document.getElementById("group-name").value.trim();
+    const participants = Array.from(participantsList.children).map((child) =>
+      child.textContent.trim()
+    );
+
+    if (!groupName || participants.length === 0) {
+      alert("Please provide a group name and add at least one participant.");
+      return;
+    }
+
+    // Logic to send the group data to the backend
+    console.log("Creating group:", { groupName, participants });
+
+    // Close the modal
+    createGroupContainer.classList.add("hidden");
+  });
+
+  function addParticipantToList(participant) {
+    const selectedList = document.getElementById('selected-participants');
+    
+    const participantDiv = document.createElement("div");
+    participantDiv.dataset.userId = participant.id;
+    
+    participantDiv.innerHTML = `
+      ${participant.name}
+      <button class="remove-participant-btn">x</button>
+    `;
+    participantDiv
+      .querySelector(".remove-participant-btn")
+      .addEventListener("click", () => {
+        participantDiv.remove();
+      });
+    selectedList.appendChild(participantDiv);
+    participantsInput.value='';
+    participantsList.innerHTML='';
+    
+  }
 });

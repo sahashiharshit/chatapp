@@ -28,6 +28,7 @@
     <ul class="group-list">
   
     </ul>
+    
   </div>
    <!-- Chat Window -->
    <div class="chat-window">
@@ -42,6 +43,39 @@
     </form>
   </div>  
 </div>
+
+<!-- Code for popup modal create group-->
+
+<div id="modal-overlay" class="hidden"></div>
+<div id="create-group-container" class="create-group">
+  <div class="create-group-header">
+    <h2>Create New Group</h2>
+    <button id="close-create-group" class="close-btn">&times;</button>
+  </div>
+  <div class="create-group-body">
+    <!-- Group Name Input -->
+    <label for="group-name">Group Name</label>
+    <input type="text" id="group-name" placeholder="Enter group name" required />
+
+    <!-- Group Participants -->
+    <label for="group-participants">Add Participants</label>
+    <input
+      type="text"
+      id="group-participants"
+      placeholder="Search and add participants"
+    />
+    <div id="participants-list">
+      <!-- Dynamically populated -->
+    </div>
+    <div id="selected-participants">
+    <!-- Dynamically populated-->
+    </div>
+  </div>
+  <div class="create-group-footer">
+    <button id="create-group-btn" class="btn-primary">Create Group</button>
+  </div>
+</div>
+<button id="open-create-group" class="floating-btn"> +</button>
 <script defer src="/js/chat.js"></script>
 </body>
 </html>

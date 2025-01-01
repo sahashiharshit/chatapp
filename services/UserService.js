@@ -1,4 +1,5 @@
 
+import { Op } from "sequelize";
 import { User } from "../models/User.js";
 
 
@@ -35,7 +36,7 @@ class UserService {
             throw new Error("Unable to create new User. Please try again");
         }
     }
-  async getAllUsers(email){
+  async getUsers(email){
     try {
         if(email){
             const user = await User.findOne(
@@ -59,6 +60,22 @@ class UserService {
     }
   }
   
+  async getUserByQuery(query,userId){
+    try {
+        const users = await User.findAll({
+        
+        where:{
+        name:{[Op.like]:`%${query}%`},
+        id:{[Op.ne]:`%${userId}%`}
+        },
+        attributes:['id','name']
+        
+        });
+        return users;
+    } catch (error) {
+        throw new Error('Failed to fetch participants');
+    }
+  }
 
 }
 

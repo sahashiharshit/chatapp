@@ -86,7 +86,7 @@ class Authentication {
     //function for geting all users from data base and sending users info to frontend
     this.getUsers = async (req, res) => {
       try {
-        const users = await UserService.getAllUsers();
+        const users = await UserService.getUsers();
 
         res.status(201).json({
           message: "Fetched all data",
