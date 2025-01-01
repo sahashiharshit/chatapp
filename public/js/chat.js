@@ -64,44 +64,41 @@ document.addEventListener("DOMContentLoaded", () => {
     //function to display messages
     displayMessages(scrollToBottom = true, userid) {
       chatMessages.innerHTML = "";
-    
-      if(this.messages.length==0){
-        const groupname = document.querySelector('.groupname');
-        groupname.innerHTML='';
-        chatMessages.innerHTML=`<p class='errornomsg'>No messages in the group yet</p>`;
-      }else{
-     
-        const groupname = document.querySelector('.groupname');
-        groupname.textContent=`${this.messages[0].Group.groupname}`
+
+      if (this.messages.length == 0) {
+        const groupname = document.querySelector(".groupname");
+        groupname.innerHTML = "";
+        chatMessages.innerHTML = `<p class='errornomsg'>No messages in the group yet</p>`;
+      } else {
+        const groupname = document.querySelector(".groupname");
+        groupname.textContent = `${this.messages[0].Group.groupname}`;
         this.messages
-        .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
-        .map((data) => {
-          const messageElement = document.createElement("div");
-          let date = new Date(data.createdAt);
-          let localtime = date.toLocaleString(undefined, {
-            year: "numeric",
-            month: "short",
-            day: "numeric",
-            hour: "2-digit",
-            minute: "2-digit",
-            hour12: true,
-          });
-          messageElement.classList.add(
-            "message",
-            data.user_id === userid ? "sent" : "received"
-          );
-          messageElement.innerHTML = `
-          <div class="username">${(data.sender.name).charAt(0).toUpperCase()}${(data.sender.name).slice(1)}</div>
+          .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
+          .map((data) => {
+            const messageElement = document.createElement("div");
+            let date = new Date(data.createdAt);
+            let localtime = date.toLocaleString(undefined, {
+              year: "numeric",
+              month: "short",
+              day: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+              hour12: true,
+            });
+            messageElement.classList.add(
+              "message",
+              data.user_id === userid ? "sent" : "received"
+            );
+            messageElement.innerHTML = `
+          <div class="username">${data.sender.name
+            .charAt(0)
+            .toUpperCase()}${data.sender.name.slice(1)}</div>
           <p>${data.message}</p>
-          <span class="timestamp">${localtime}</span>
-          
-          
+          <span class="timestamp">${localtime}</span>      
           `;
-          chatMessages.appendChild(messageElement);
- 
-      
-      });
-    }
+            chatMessages.appendChild(messageElement);
+          });
+      }
       if (scrollToBottom) {
         chatMessages.scrollTop = chatMessages.scrollHeight;
       }
