@@ -17,7 +17,7 @@ pipeline {
         stage('Deploy'){
             steps{
                 sshagent(['aws-chatapp-server']){
-                sh scp -o UserKnownHostsFile=~/.ssh/known_hosts -r . ubuntu@3.6.134.76:/chatserver/
+                sh 'scp -o UserKnownHostsFile=~/.ssh/known_hosts -r . ubuntu@3.6.134.76:/chatserver/'
                 }
                 
             }
