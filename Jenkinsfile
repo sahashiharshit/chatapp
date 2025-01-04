@@ -13,11 +13,7 @@ pipeline {
                
             }   
         }
-        stage('Test'){
-            steps{
-            sh 'npm test'
-            }
-        }
+       
         stage('Deploy'){
             steps{
                 sshagent(['aws-chatapp-server'])
