@@ -17,7 +17,7 @@ pipeline {
         stage('Deploy'){
             steps{
                 sshagent(['aws-chatapp-server'])
-                sh 'scp -r build/ ubuntu@ip-172-31-4-205:/chatserver/'
+                sh 'scp -r build/ ubuntu@3.6.134.76:/chatserver/'
             }
         }
     }
