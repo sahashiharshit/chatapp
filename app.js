@@ -5,22 +5,29 @@ import { dbconnection } from "./config/database.js";
 import routes from "./router/index.js";
 import path from "path";
 import { fileURLToPath } from "url";
-// import session from "express-session";
-// import SequelizeStore from 'connect-session-sequelize';
-// import { isAuthenticated } from "./middleware/authenticate.js";
-// import cookieParser from "cookie-parser";
+import { Server } from "socket.io";
+import http from 'http';
+import socketHandler from "./socket/socketHandler.js";
+import { configDotenv } from "dotenv";
 
+configDotenv();
 const app = express();
-const port = 3000;
-const privateKey = fs.readFileSync("private.pem", "utf-8");
+const server =http.createServer(app);
+//Start Server
+const io = new Server(server,{
+  cors:{origin:'*',},
+  
+  });
+  socketHandler.handleSocketEvents(io);
+
+
+
+
+
+//const privateKey = fs.readFileSync("private.pem", "utf-8");
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// const SessionStore = SequelizeStore(session.Store);
-// const store =new SessionStore({
-//     db:sequelize,
-// });
-// app.use(cookieParser());
 
 app.use(express.json());
 app.use(
@@ -38,23 +45,7 @@ app.use(
     // credentials:true,
   })
 );
-// app.use(
 
-//   session({
-//       secret:privateKey,
-//       store:store,
-//       resave:false,
-//       saveUninitialized:false,
-//       cookie:{
-//       secure:false,
-//       httpOnly:true,
-//       sameSite:'strict',
-//       maxAge:1000*60*60*2,
-
-//       },
-//   })
-//   );
-//   store.sync();
 
 //Static file serving
 app.use(express.static(path.join(__dirname, "public")));
@@ -87,13 +78,13 @@ app.use((err, req, res, next) => {
   res.status(500).send("Something went wrong!");
 });
 
-//Start Server
+
 (async () => {
   try {
     await dbconnection.authenticate();
     console.log("Database connected");
-    app.listen(port, () => {
-      console.log(`Server running on http://localhost:${port}`);
+    server.listen(process.env.SERVER_PORT||3000, () => {
+      console.log(`Server running on http://localhost:${process.env.PORT||3000}`);
     });
   } catch (error) {
     console.error("Unable to connect to the database:", error);

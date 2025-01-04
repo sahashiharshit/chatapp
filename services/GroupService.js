@@ -1,4 +1,5 @@
 import {GroupMembers,Groups,User} from '../config/association.js';
+import { dbconnection } from '../config/database.js';
 
 class GroupService{
 
@@ -29,14 +30,23 @@ class GroupService{
         }
         
         }
-        
-        async createNewGroup(groupname,createdBy){
-        
+        //For creating new Group and creating members in bulk to group members table
+        async createNewGroup(groupname,createdBy,groupparticipantsList){
+          const t = await dbconnection.transaction();
         try {
-            const result = await Groups.create({groupname,created_by:createdBy});
-            await GroupMembers.create({group_id:result.id,user_id:createdBy});
-            return result;
+        
+            const group = await Groups.create({groupname,created_by:createdBy},{transaction:t});
+            const allParticipants = [...groupparticipantsList,createdBy];
+            const groupMembers = allParticipants.map(userId=>({
+            
+            group_id:group.id,
+            user_id:userId
+            }));
+            await GroupMembers.bulkCreate(groupMembers,{transaction:t});
+            await t.commit();
+            return group;
         } catch (error) {
+          await t.rollback();
             throw new Error('error in creating groups, try again later!');
         }
         

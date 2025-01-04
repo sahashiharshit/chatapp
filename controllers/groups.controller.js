@@ -8,10 +8,12 @@ constructor(){
 
     //function to create Groups
     this.createGroup=async(req,res)=>{
+        
         try {
-        const {groupname, createdBy} = req.body;
-            const newgroup = await GroupService.createNewGroup(groupname,createdBy);
+        const {groupName, createdBy,groupparticipantsList} = req.body;
+            const newgroup = await GroupService.createNewGroup(groupName,createdBy,groupparticipantsList);
             res.status(201).json({message:"Group created Succefully",newgroup});
+            
         } catch (error) {
             res.status(500).json({error: "Failed to create group", details: error.message})
         }

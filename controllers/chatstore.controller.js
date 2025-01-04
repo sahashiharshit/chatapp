@@ -2,15 +2,14 @@ import DataService from "../services/DataService.js";
 
 class Chatstore {
   constructor() {
-    this.storechat = async (req, res) => {
+    this.storechat = async (data) => {
       try {
-        const { groupId, userId, message } = req.body;
-        const chat = await DataService.storeInDb(groupId, userId, message);
+        const { groupId, userId, message } = data;
+        const savedMessage = await DataService.storeInDb(groupId, userId, message);
        
-        res.status(201).json({chat});
+       return savedMessage;
       } catch (error) {
-        console.error("Error:", error);
-        res.status(500).json(error);
+        throw new Error('Error saving message:'+ error.message);
       }
     };
     this.getMessages = async (req, res) => {

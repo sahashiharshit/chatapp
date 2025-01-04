@@ -66,7 +66,7 @@ class UserService {
         
         where:{
         name:{[Op.like]:`%${query}%`},
-        id:{[Op.ne]:`%${userId}%`}
+        id:{[Op.ne]:`${userId}`}
         },
         attributes:['id','name']
         
