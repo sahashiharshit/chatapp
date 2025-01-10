@@ -3,7 +3,7 @@ import { io } from "https://cdn.socket.io/4.8.1/socket.io.esm.min.js";
 
 
 document.addEventListener("DOMContentLoaded", () => {
-  const socket = io('http://localhost:3000');
+ 
 
   class Login {
     constructor() {
@@ -36,14 +36,21 @@ document.addEventListener("DOMContentLoaded", () => {
         const data = await response.json();
        
         const token = data.token;
-        const userId = data.user.id;
+        const user_id = data.user.id;
         if (response.ok) {
+          const socket = io('http://localhost:3000');
           
           alert("Login Successful");
-          const socketId = socket.id;
-          localStorage.setItem(`${userId}_data`,token);  
-         const encodedParams = btoa(`userId=${encodeURIComponent(userId)}&socketId=${encodeURIComponent(socketId)}`)
-          this.navigate(`chatpage.html?data=${encodedParams}`);//pass userId in URL
+          socket.on('connect',()=>{
+            const socketId = socket.id;
+            const userId = user_id;
+            localStorage.setItem(`${userId}_data`,token);
+            const encodedParams = btoa(`userId=${encodeURIComponent(userId)}&socketId=${encodeURIComponent(socketId)}`);
+            this.navigate(`chatpage.html?data=${encodedParams}`);//pass userId in URL
+          });
+           
+          
+          
         } else {
           alert("Login Failed");
         }

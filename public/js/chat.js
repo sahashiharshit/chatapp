@@ -1,4 +1,3 @@
-import { query } from "express";
 import { io } from "https://cdn.socket.io/4.8.1/socket.io.esm.min.js";
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -19,8 +18,6 @@ document.addEventListener("DOMContentLoaded", () => {
   let grouptemporaryParticipants = [];
 
   let isLoading = false; // Prevent multiple concurrent loads
-  let fetchInterval; // Reference to the setInterval
-  const FETCH_INTERVAL_MS = 5000; // Interval duration
 
   //class chat
   class Chat {
@@ -51,7 +48,7 @@ document.addEventListener("DOMContentLoaded", () => {
           listitem.dataset.id = group.id;
           listitem.innerHTML = `<i class="fa-solid fa-user-group"></i>&ThinSpace;${group.groupname}`;
           listitem.addEventListener("click", (event) =>
-            this.showGroupMessage(group.id,userId)
+            this.showGroupMessage(group.id, userId)
           );
           grouplist.appendChild(listitem);
         });
@@ -60,10 +57,9 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
 
-    async showGroupMessage(groupid,loggedInuserId) {
+    async showGroupMessage(groupid, loggedInuserId) {
       const msgBox = document.getElementById("msg");
       msgBox.dataset.id = groupid;
-      
 
       try {
         const response = await fetch(
@@ -73,7 +69,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const messages = await response.json();
 
         this.messages = messages.messages;
-        this.displayMessages(true, userid);
+        this.displayMessages(true, loggedInuserId);
       } catch (error) {
         console.log(error);
       }
@@ -90,6 +86,7 @@ document.addEventListener("DOMContentLoaded", () => {
       } else {
         const groupname = document.querySelector(".groupname");
         groupname.textContent = `${this.messages[0].Group.groupname}`;
+        // console.log(this.messages);
         this.messages
           .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
           .map((data) => {
@@ -114,7 +111,7 @@ document.addEventListener("DOMContentLoaded", () => {
           <p>${data.message}</p>
           <span class="timestamp">${localtime}</span>      
           `;
-            chatMessages.appendChild(messageElement);
+          chatMessages.appendChild(messageElement);
           });
       }
       if (scrollToBottom) {
@@ -228,12 +225,6 @@ document.addEventListener("DOMContentLoaded", () => {
       } catch (error) {
         console.error("Error fetching older messages:", error);
       } finally {
-        // setTimeout(() => {
-        //   fetchInterval = setInterval(
-        //     () => this.fetchMessages(),
-        //     FETCH_INTERVAL_MS
-        //   );
-        // }, FETCH_INTERVAL_MS);
         isLoading = false;
       }
     }
@@ -241,31 +232,8 @@ document.addEventListener("DOMContentLoaded", () => {
     //function to send message to database
     async sendMessage(groupId, userId, message) {
       if (!message.trim()) return;
-      socket.emit
-      // try {
-      //   const response = await fetch(
-      //     "http://127.0.0.1:3000/chatapp/chat/sendmessage",
-      //     {
-      //       method: "POST",
-      //       headers: {
-      //         "Content-Type": "application/json",
-      //       },
-      //       body: JSON.stringify({
-      //         groupId: groupId,
-      //         userId: userId,
-      //         message: message,
-      //       }),
-      //     }
-      //   );
-      //   // console.log(await response.text());
-      //   if (response.ok) {
-      //     this.showGroupMessage(groupId); // Refresh the messages after sending
-      //     document.querySelector("#msg").value = ""; // Clear the message input
-      //   }
-      //   //console.log(this.messages);
-      // } catch (error) {
-      //   console.error("Error sending message:", error);
-      // }
+      socket.emit("sendMessage", { groupId, userId, message });
+   
     }
     //For adding participant to a group
     addParticipantToList = (participant) => {
@@ -286,6 +254,7 @@ document.addEventListener("DOMContentLoaded", () => {
       participantsInput.value = "";
       participantsList.innerHTML = "";
     };
+    
     removeParticipants = (id) => {
       const participantItem = document.querySelector(`[data-user-id="${id}"]`);
       if (participantItem) participantItem.remove();
@@ -326,7 +295,7 @@ document.addEventListener("DOMContentLoaded", () => {
     //to store data of group and users in database
     saveGroupInfo = async (
       groupName,
-     loggedInuserId,
+      loggedInuserId,
       groupparticipantsList
     ) => {
       // Logic to send the group data to the backend
@@ -338,7 +307,7 @@ document.addEventListener("DOMContentLoaded", () => {
           },
           body: JSON.stringify({
             groupName: groupName,
-            createdBy:loggedInuserId,
+            createdBy: loggedInuserId,
             groupparticipantsList: groupparticipantsList,
           }),
         });
@@ -348,60 +317,97 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     };
     //code to logout
-    async logout() {
-      try {
-        const response = await fetch(
-          "http://127.0.0.1:3000/chatapp/auth/logout",
-          {
-            method: "POST",
-            //  credentials: "include",
-          }
-        );
+     logout(loggedInuserId) {
+     
+      const data = localStorage.getItem(`${loggedInuserId}_data`);
 
-        if (response.ok) {
-          alert("Logout successful.");
-          localStorage.removeItem(`${userId}_data`);
-          this.navigate("login.html");
-        } else {
-          alert("Failed to logout. Please try again.");
-        }
-      } catch (error) {
-        console.error("Error logging out:", error);
+      if (data) {
+        alert("Logout successful.");
+        localStorage.removeItem(`${loggedInuserId}_data`);
+        socket.disconnect();
+        this.navigate("login.html");
+      } else {
+        alert("Failed to logout. Please try again.");
       }
     }
-    
-    getQueryParam(param){
-    const urlParams = new URLSearchParams(window.location.search);
-    return urlParams.get(param);
+
+    getQueryParam(param) {
+      const urlParams = new URLSearchParams(window.location.search);
+      return urlParams.get(param);
     }
-    decodeQueryParams(data){
-      
+    decodeQueryParams(data) {
       const decodedData = atob(data);
       return new URLSearchParams(decodedData);
-      }
+    }
+    displayInstantMessages(message,loggedInuserId){
+      const messageElement = document.createElement("div");
+            let date = new Date(message.timestamp);
+            let localtime = date.toLocaleString(undefined, {
+              year: "numeric",
+              month: "short",
+              day: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+              hour12: true,
+            });
+            messageElement.classList.add(
+              "message",
+              message.user_id === loggedInuserId ? "sent" : "received"
+            );
+            messageElement.innerHTML = `
+            <div class="username">${message.sender
+              .charAt(0)
+              .toUpperCase()}${message.sender.slice(1)}</div>
+            <p>${message.text}</p>
+            <span class="timestamp">${localtime}</span>      
+            `;
+            chatMessages.appendChild(messageElement);
+    }
   }
 
   const chat = new Chat();
-  const encodedQueryParams = chat.getQueryParam('data');
+  const encodedQueryParams = chat.getQueryParam("data");
   const params = chat.decodeQueryParams(encodedQueryParams);
-  
-  const loggedInuserId =params.get("userId");
+
+  const loggedInuserId = params.get("userId");
   const socketId = params.get("socketId");
   const data = localStorage.getItem(`${loggedInuserId}_data`);
-  if (!socketId || !loggedInuserId||!data) {
+  if (!socketId || !loggedInuserId || !data) {
     alert("Invalid session. Please log in again.");
-    chat.navigate('login.html');// Redirect to login
-    
+    chat.navigate("login.html"); // Redirect to login
   }
-  const socket = io("http://localhost:3000",{
-  query:{socketId,loggedInuserId}
-  })
+  const socket = io("http://localhost:3000", {
+    query: { socketId, loggedInuserId, },
+  });
+  socket.on("connect",()=>{
+    console.log("Connected with socket ID:", socket.id);
+    
+  });
+  socket.on('socketIdUpdated',({socketId})=>{
+  console.log("Updated Socket ID:",socketId);
+  });
+  
+  chat.getGroups(loggedInuserId);
+
+  socket.on("newMessage", (message) => {
+    console.log("new Message ", message);
+    //chat.messages.push(message.text);
+    chat.displayInstantMessages(message,loggedInuserId);
+  });
+  
+  //Event Listeners
+  document.getElementById("logout").addEventListener("click",e=>{
+  
+    e.preventDefault();
+    chat.logout(loggedInuserId);
+  });
+  
   document.getElementById("sendmsg").addEventListener("submit", (e) => {
     e.preventDefault();
     const message = e.target.elements.msg.value;
     const groupId = e.target.elements.msg.dataset.id;
 
-    chat.sendMessage(groupId,loggedInuserId, message);
+    chat.sendMessage(groupId, loggedInuserId, message);
   });
   // chatMessages.addEventListener("scroll", async () => {
   //   console.log("scroll up");
@@ -436,7 +442,7 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
     try {
-      const participants = await chat.fetchParticipants(query,loggedInuserId);
+      const participants = await chat.fetchParticipants(query, loggedInuserId);
 
       chat.displayParticipantList(participants);
     } catch (error) {
@@ -454,7 +460,7 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    chat.saveGroupInfo(groupName,loggedInuserId, grouptemporaryParticipants);
+   await chat.saveGroupInfo(groupName, loggedInuserId, grouptemporaryParticipants);
 
     console.log("Group created Success");
 

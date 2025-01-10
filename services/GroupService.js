@@ -7,12 +7,7 @@ class GroupService{
         try {
        const result = await Groups.findAll({
             include:[
-            // {
-            // model:User,
-            // as:"creator",
-            // where:{id:userId},
-            // required:false,
-            // },
+            
             {
                  model:User,
                  as:'members',
@@ -36,12 +31,18 @@ class GroupService{
         try {
         
             const group = await Groups.create({groupname,created_by:createdBy},{transaction:t});
-            const allParticipants = [...groupparticipantsList,createdBy];
-            const groupMembers = allParticipants.map(userId=>({
+         
+            const groupMembers = [
+              {group_id:group.id,user_id:createdBy,isAdmin:true},
+              ...groupparticipantsList.map(memberId=>({
+              
+              group_id:group.id,
+              user_id:memberId,
+              isAdmin:false
+              })),
+            ]
             
-            group_id:group.id,
-            user_id:userId
-            }));
+            
             await GroupMembers.bulkCreate(groupMembers,{transaction:t});
             await t.commit();
             return group;

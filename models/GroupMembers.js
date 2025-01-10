@@ -21,6 +21,7 @@ GroupMembers.init(
       allowNull: false,
       references: { model: User, key: "id" },
     },
+    isAdmin:{type:DataTypes.BOOLEAN,defaultValue:false},
   },
   {
     sequelize: dbconnection,

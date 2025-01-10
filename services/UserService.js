@@ -59,7 +59,20 @@ class UserService {
         throw new Error("Unable to find users. Please try agin")
     }
   }
-  
+  async getUserById(userId){
+  try{
+    const user = await User.findOne({
+    where:{
+    id:userId,
+    },
+    });
+    return user;
+  }
+    catch(error){
+    console.error('no user found');
+    throw new Error('No User found with this userId');
+    }  
+  }
   async getUserByQuery(query,userId){
     try {
         const users = await User.findAll({
