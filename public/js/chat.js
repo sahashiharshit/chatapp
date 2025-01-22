@@ -1,23 +1,46 @@
 import { io } from "https://cdn.socket.io/4.8.1/socket.io.esm.min.js";
 
 document.addEventListener("DOMContentLoaded", () => {
+  //html elements selected by selectors
   const chatMessages = document.querySelector(".chat-messages");
-
-  // Toggle Create Group Modal
   const openCreateGroup = document.getElementById("open-create-group");
   const closeCreateGroup = document.getElementById("close-create-group");
-  const createGroupContainer = document.getElementById(
-    "create-group-container"
-  );
+  const createGroupContainer = document.getElementById("create-group-container");
   const createGroupBtn = document.getElementById("create-group-btn");
   const modalOverlay = document.getElementById("modal-overlay");
   const participantsInput = document.getElementById("group-participants");
   const participantsList = document.getElementById("participants-list");
   const selectedList = document.getElementById("selected-participants");
-
+  const groupName = document.getElementById("groupName");
+  const closePopupButton = document.getElementById("close-popup"); 
+  //
+  //variables
   let grouptemporaryParticipants = [];
+  let isLoading = false;
+  let selectedGroupId = null;
+  
+  const SERVER_URL = "http://localhost:3000";
+  //Utility functions
+  const debounce = (func, delay) => {
+    let timer;
+    return (...args) => {
+      clearTimeout(timer);
+      timer = setTimeout(() => func(...args), delay);
+    };
+  };
 
-  let isLoading = false; // Prevent multiple concurrent loads
+  const sanitizeHTMl = (str) =>
+    str.replace(
+      /[&<>"']/g,
+      (match) =>
+        ({
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;",
+          "'": "&#039;",
+        }[match])
+    );
 
   //class chat
   class Chat {
@@ -33,7 +56,7 @@ document.addEventListener("DOMContentLoaded", () => {
     async getGroups(userId) {
       try {
         const response = await fetch(
-          `http://127.0.0.1:3000/chatapp/groups/${userId}/groups`
+          `${SERVER_URL}/chatapp/groups/${userId}/groups`
         );
         const data = await response.json();
 
@@ -48,45 +71,66 @@ document.addEventListener("DOMContentLoaded", () => {
           listitem.dataset.id = group.id;
           listitem.innerHTML = `<i class="fa-solid fa-user-group"></i>&ThinSpace;${group.groupname}`;
           listitem.addEventListener("click", (event) =>
-            this.showGroupMessage(group.id, userId)
+            this.joinGroup(group.id, userId)
           );
           grouplist.appendChild(listitem);
         });
       } catch (error) {
-        console.log(error);
+        console.error("Error fetching groups:", error);
+        alert("Unable to fetch groups. Please try again later.");
       }
     }
+  //Joingroup method
+    async joinGroup(groupid, loggedInuserId) {
+      selectedGroupId = groupid;
 
-    async showGroupMessage(groupid, loggedInuserId) {
-      const msgBox = document.getElementById("msg");
-      msgBox.dataset.id = groupid;
+      socket.emit("join-group", selectedGroupId);
 
       try {
         const response = await fetch(
-          `http://127.0.0.1:3000/chatapp/chat/messages?groupId=${groupid}&userId=${loggedInuserId}`
+          `${SERVER_URL}/chatapp/chat/messages?groupId=${selectedGroupId}&userId=${loggedInuserId}`
         );
+        if (!response.ok) throw new Error("Failed to fetch messages");
+        const groupMessages = await response.json();
 
-        const messages = await response.json();
+        this.messages = groupMessages.slice(-20);
 
-        this.messages = messages.messages;
+        this.saveMessagesToLocal();
         this.displayMessages(true, loggedInuserId);
       } catch (error) {
         console.log(error);
       }
     }
 
+    async getUsersList(group_id,loggedInuserId){
+      
+      try {
+        const response=await fetch(`${SERVER_URL}/chatapp/groups/getUsers/${group_id}/${loggedInuserId}`);
+        const data = await response.json();
+
+        return data;
+      } catch (error) {
+        console.log(error);
+      }
+      
+      
+    
+    }
+
     //function to display messages
     displayMessages(scrollToBottom = true, userid) {
       chatMessages.innerHTML = "";
 
-      if (this.messages.length == 0) {
+      if (this.messages.length === 0) {
         const groupname = document.querySelector(".groupname");
         groupname.innerHTML = "";
         chatMessages.innerHTML = `<p class='errornomsg'>No messages in the group yet</p>`;
       } else {
+        
         const groupname = document.querySelector(".groupname");
         groupname.textContent = `${this.messages[0].Group.groupname}`;
-        // console.log(this.messages);
+        groupname.setAttribute('id',`${this.messages[0].group_id}`);
+
         this.messages
           .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
           .map((data) => {
@@ -105,18 +149,19 @@ document.addEventListener("DOMContentLoaded", () => {
               data.user_id === userid ? "sent" : "received"
             );
             messageElement.innerHTML = `
-          <div class="username">${data.sender.name
+          <div class="username">${sanitizeHTMl(data.sender.name)
             .charAt(0)
-            .toUpperCase()}${data.sender.name.slice(1)}</div>
-          <p>${data.message}</p>
+            .toUpperCase()}${sanitizeHTMl(data.sender.name.slice(1))}</div>
+          <p>${sanitizeHTMl(data.message)}</p>
           <span class="timestamp">${localtime}</span>      
           `;
-          chatMessages.appendChild(messageElement);
+            chatMessages.appendChild(messageElement);
           });
       }
       if (scrollToBottom) {
         chatMessages.scrollTop = chatMessages.scrollHeight;
       }
+
     }
 
     //Function to fetch messages
@@ -141,9 +186,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const lastTimestamp = lastMessage ? lastMessage.createdAt : "";
 
         const response = await fetch(
-          `http://127.0.0.1:3000/chatapp/chat/messages?after=${encodeURIComponent(
-            lastTimestamp
-          )}`
+          `${SERVER_URL}/chatapp/chat/messages/${lastTimestamp}`
         );
         if (!response.ok) {
           throw new Error("Failed to fetch Messages");
@@ -174,12 +217,12 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     //saves messages in local storage
     saveMessagesToLocal() {
-      //const recentMessages = this.messages.slice(-50);
+      // const recentMessages = this.messages.slice(-20);
       localStorage.setItem("chatMessages", JSON.stringify(this.messages));
     }
 
     //Function to fetch old messages
-    async fetchOlderMessages() {
+    async fetchOlderMessages(loggedInuserId) {
       if (isLoading) return;
       isLoading = true;
 
@@ -191,11 +234,9 @@ document.addEventListener("DOMContentLoaded", () => {
       }
       try {
         //Pause interval fetching
-        clearInterval(fetchInterval);
+
         const response = await fetch(
-          `http://127.0.0.1:3000/chatapp/chat/messages?before=${encodeURIComponent(
-            firstTimestamp
-          )}`
+          `${SERVER_URL}/chatapp/chat/messages/${firstTimestamp}?groupId=${selectedGroupId}&userId=${loggedInuserId}`
         );
 
         if (!response.ok) {
@@ -203,7 +244,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         const olderMessages = await response.json();
-
+        console.log(olderMessages);
         if (!Array.isArray(olderMessages) || olderMessages.length === 0) {
           console.log("No older messages found.");
           isLoading = false;
@@ -218,7 +259,7 @@ document.addEventListener("DOMContentLoaded", () => {
         this.saveMessagesToLocal();
 
         // Display all messages
-        this.displayMessages(false);
+        this.displayMessages(false, loggedInuserId);
         // Adjust the scroll position to maintain the user's current view
         const newScrollHeight = chatMessages.scrollHeight;
         chatMessages.scrollTop = newScrollHeight - oldScrollHeight;
@@ -230,10 +271,9 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     //function to send message to database
-    async sendMessage(groupId, userId, message) {
+    async sendMessage(userId, message) {
       if (!message.trim()) return;
-      socket.emit("sendMessage", { groupId, userId, message });
-   
+      socket.emit("sendMessage", { groupId: selectedGroupId, userId, message });
     }
     //For adding participant to a group
     addParticipantToList = (participant) => {
@@ -254,7 +294,7 @@ document.addEventListener("DOMContentLoaded", () => {
       participantsInput.value = "";
       participantsList.innerHTML = "";
     };
-    
+
     removeParticipants = (id) => {
       const participantItem = document.querySelector(`[data-user-id="${id}"]`);
       if (participantItem) participantItem.remove();
@@ -268,7 +308,7 @@ document.addEventListener("DOMContentLoaded", () => {
     //fetch participants to include in group
     fetchParticipants = async (query, userId) => {
       const response = await fetch(
-        `http://127.0.0.1:3000/chatapp/groups/search-participants?query=${encodeURIComponent(
+        `${SERVER_URL}/chatapp/groups/search-participants?query=${encodeURIComponent(
           query
         )}&userId=${encodeURIComponent(userId)}`
       );
@@ -300,7 +340,7 @@ document.addEventListener("DOMContentLoaded", () => {
     ) => {
       // Logic to send the group data to the backend
       try {
-        const response = await fetch(`http://127.0.0.1:3000/chatapp/groups/`, {
+        const response = await fetch(`${SERVER_URL}/chatapp/groups/`, {
           method: "POST",
           headers: {
             "Content-type": "application/json",
@@ -317,13 +357,13 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     };
     //code to logout
-     logout(loggedInuserId) {
-     
+    logout(loggedInuserId) {
       const data = localStorage.getItem(`${loggedInuserId}_data`);
 
       if (data) {
         alert("Logout successful.");
         localStorage.removeItem(`${loggedInuserId}_data`);
+        localStorage.removeItem("chatMessages");
         socket.disconnect();
         this.navigate("login.html");
       } else {
@@ -339,29 +379,31 @@ document.addEventListener("DOMContentLoaded", () => {
       const decodedData = atob(data);
       return new URLSearchParams(decodedData);
     }
-    displayInstantMessages(message,loggedInuserId){
+    displayInstantMessages(message, loggedInuserId, scrollToBottom = true) {
       const messageElement = document.createElement("div");
-            let date = new Date(message.timestamp);
-            let localtime = date.toLocaleString(undefined, {
-              year: "numeric",
-              month: "short",
-              day: "numeric",
-              hour: "2-digit",
-              minute: "2-digit",
-              hour12: true,
-            });
-            messageElement.classList.add(
-              "message",
-              message.user_id === loggedInuserId ? "sent" : "received"
-            );
-            messageElement.innerHTML = `
+      let date = new Date(message.timestamp);
+      let localtime = date.toLocaleString(undefined, {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: true,
+      });
+      messageElement.classList.add(
+        "message",
+        message.user_id === loggedInuserId ? "sent" : "received"
+      );
+      messageElement.innerHTML = `
             <div class="username">${message.sender
               .charAt(0)
               .toUpperCase()}${message.sender.slice(1)}</div>
             <p>${message.text}</p>
             <span class="timestamp">${localtime}</span>      
             `;
-            chatMessages.appendChild(messageElement);
+      chatMessages.appendChild(messageElement);
+
+      if (scrollToBottom) chatMessages.scrollTop = chatMessages.scrollHeight;
     }
   }
 
@@ -376,46 +418,91 @@ document.addEventListener("DOMContentLoaded", () => {
     alert("Invalid session. Please log in again.");
     chat.navigate("login.html"); // Redirect to login
   }
-  const socket = io("http://localhost:3000", {
-    query: { socketId, loggedInuserId, },
+  const socket = io(SERVER_URL, {
+    query: { socketId, loggedInuserId },
   });
-  socket.on("connect",()=>{
+  socket.on("connect", () => {
     console.log("Connected with socket ID:", socket.id);
-    
   });
-  socket.on('socketIdUpdated',({socketId})=>{
-  console.log("Updated Socket ID:",socketId);
+  socket.on("socketIdUpdated", ({ socketId }) => {
+    console.log("Updated Socket ID:", socketId);
   });
-  
+
   chat.getGroups(loggedInuserId);
 
   socket.on("newMessage", (message) => {
-    console.log("new Message ", message);
-    //chat.messages.push(message.text);
-    chat.displayInstantMessages(message,loggedInuserId);
+    if (message.groupId !== selectedGroupId) return;
+    chat.displayInstantMessages(message, loggedInuserId);
   });
-  
+
   //Event Listeners
-  document.getElementById("logout").addEventListener("click",e=>{
-  
+  document.getElementById("logout").addEventListener("click", (e) => {
     e.preventDefault();
     chat.logout(loggedInuserId);
   });
-  
+
+  //sending messages eventlistener
   document.getElementById("sendmsg").addEventListener("submit", (e) => {
     e.preventDefault();
-    const message = e.target.elements.msg.value;
-    const groupId = e.target.elements.msg.dataset.id;
+    const message = sanitizeHTMl(e.target.elements.msg.value.trim());
+    if (!message || !selectedGroupId) return;
 
-    chat.sendMessage(groupId, loggedInuserId, message);
+    chat.sendMessage(loggedInuserId, message);
+    e.target.elements.msg.value = "";
   });
-  // chatMessages.addEventListener("scroll", async () => {
-  //   console.log("scroll up");
-  //   if (chatMessages.scrollTop === 0) {
-  //     await chat.fetchOlderMessages();
-  //   }
-  // });
 
+  chatMessages.addEventListener(
+    "scroll",
+    debounce(async () => {
+      if (chatMessages.scrollTop === 0) {
+        await chat.fetchOlderMessages(loggedInuserId);
+      }
+    }, 300)
+  );
+
+  //Open and close userlist popup
+  groupName.addEventListener("click",async()=>{
+    const popup = document.getElementById('popup');
+    const userlist = document.getElementById('user-list');
+    const groupname = document.querySelector('.groupname');
+    const group_id= groupname.getAttribute('id');
+    if(groupname.innerText==""){
+      
+      return;
+    }
+      popup.classList.remove='hidden';
+      popup.style.display='flex';
+      
+      const users = await chat.getUsersList(group_id,loggedInuserId);
+      const {members,isLoggedInUserAdmin} =users;
+      
+      userlist.innerHTML="";
+      members.forEach((member)=>{
+      const listitem = document.createElement('li');
+      const span = document.createElement('span');
+       span.textContent =`${member.userName} ${member.isAdmin ? "(Admin)" : "(Member)"}`;
+       listitem.appendChild(span);
+      //  console.log(member.isAdmin);
+       console.log(isLoggedInUserAdmin);
+      if(isLoggedInUserAdmin && !member.isAdmin){
+      console.log('creating remove ')
+        const removeButton = document.createElement("button");
+        removeButton.textContent = "Remove";
+        removeButton.className = "remove-btn";
+        removeButton.onclick = () => removeMember(group_id, member.userId);
+        listitem.appendChild(removeButton);
+      }
+      userlist.appendChild(listitem);
+      }); 
+      
+     });
+    closePopupButton.addEventListener('click',()=>{
+    
+    const popup = document.getElementById('popup');
+    popup.style.display='none';
+    popup.classList.add='hidden';
+    });
+    
   //To open and close popup
   openCreateGroup.addEventListener("click", () => {
     createGroupContainer.style.display = "flex";
@@ -453,14 +540,20 @@ document.addEventListener("DOMContentLoaded", () => {
   //Create Group button eventListener
 
   createGroupBtn.addEventListener("click", async () => {
-    const groupName = document.getElementById("group-name").value.trim();
+    const groupName = sanitizeHTMl(
+      document.getElementById("group-name").value.trim()
+    );
 
     if (!groupName || grouptemporaryParticipants.length === 0) {
       alert("Please provide a group name and add at least one participant.");
       return;
     }
 
-   await chat.saveGroupInfo(groupName, loggedInuserId, grouptemporaryParticipants);
+    await chat.saveGroupInfo(
+      groupName,
+      loggedInuserId,
+      grouptemporaryParticipants
+    );
 
     console.log("Group created Success");
 

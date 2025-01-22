@@ -64,6 +64,34 @@ class GroupService{
             throw new Error('Failed to add member');
         }
       }
-
+  
+  async getGroupUser(group_id){
+    
+    try {
+        const result = await Groups.findOne(
+        {
+        where:{id:group_id},
+        include:[
+        {
+          model:User,
+          as:"members",
+          attributes:['id','name'],
+          through:{
+          model:GroupMembers,
+          attributes:['isAdmin'],
+          },
+        },
+        ],
+        },
+        
+        );
+        if(!result) throw new Error('Group not Found');
+        
+        return result;
+        
+    } catch (error) {
+      console.log(error);
+    }
+  }
 }
 export default new GroupService();

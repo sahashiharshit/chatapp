@@ -57,6 +57,24 @@ constructor(){
         }
     
     }
+    this.getUsersByGroupName = async(req,res)=>{
+    
+    const {group_id,loggedInUserId} = req.params;
+    try {
+        const users = await GroupService.getGroupUser(group_id);
+        const loggedInUser = users.members.find((member)=>member.id===loggedInUserId);
+        const isAdmin = loggedInUser?loggedInUser.GroupMembers.isAdmin:false;
+        
+        res.status(203).json({ members : users.members.map((member)=>({
+            userId:member.id,   
+            userName:member.name,
+            isAdmin:member.GroupMembers.isAdmin,
+          })),isLoggedInUserAdmin:isAdmin,});
+    } catch (error) {
+        res.status(404).json({error:'Faild to find Users'});
+    }
+    
+    }
 
 }
 

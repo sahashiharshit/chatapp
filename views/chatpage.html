@@ -1,83 +1,100 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Chat App</title>
-  
+
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
-  integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" 
-  crossorigin="anonymous" referrerpolicy="no-referrer" />
+    integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css">
 
-<link rel="stylesheet" href="/css/chat.css" />
+  <link rel="stylesheet" href="/css/chat.css" />
 </head>
+
 <body>
-  <div class="page-header">
-    <div class="logo"><i class="fas fa-smile"></i> Chat App</div>
-    <button  id="logout" class="Logout" >Logout</button>
-  </div>
-<div class="chat-container">
-  
-  
-  <!-- Sidebar for groups-->
-  <div class="chat-sidebar">
-    <div class="sidebar-header">
-      <h2>Groups <i class="fa-solid fa-people-group"></i></h2>
-    
-      <button id="open-create-group" class="floating-btn"> Create Group &ThinSpace;<i class="fa-solid fa-square-plus"></i></button>
-    </div>
-    <ul class="group-list">
-  
-    </ul>
-    
-  </div>
-   <!-- Chat Window -->
-   <div class="chat-window">
-    <div class="chat-header">
-      <h3 class="groupname"></h3>
-    </div>
-    <div class="chat-messages">
-    </div>
-    <form class="chat-input" id="sendmsg">
-        <input type="text" id="msg" placeholder="Type a message..." required />
-        <button type="submit"><i class="fas fa-paper-plane"></i> Send</button>
-    </form>
-  </div>  
-</div>
 
-<!-- Code for popup modal create group-->
+  <div class="chat-container">
+    <div class="page-header">
+      <div class="logo"><i class="fas fa-smile"></i> Chat App</div>
+      <div class="button-container">
+        <button id="logout" class="logout">  <i class="fa-solid fa-right-from-bracket" aria-hidden="true"></i></button>
+        <div class="tooltip">Logout</div>
+      </div>
+      </div>
 
-<div id="modal-overlay" class="hidden"></div>
-<div id="create-group-container" class="create-group">
-  <div class="create-group-header">
-    <h2>Create New Group</h2>
-    <button id="close-create-group" class="close-btn">&times;</button>
-  </div>
-  <div class="create-group-body">
-    <!-- Group Name Input -->
-    <label for="group-name">Group Name</label>
-    <input type="text" id="group-name" placeholder="Enter group name" required />
+    <div class="bottom-container">
+      <!-- Sidebar for groups-->
+      <div class="chat-sidebar">
+        <div class="sidebar-header">
+          <h2>Groups <i class="fa-solid fa-people-group" aria-hidden="true"></i></h2>
 
-    <!-- Group Participants -->
-    <label for="group-participants">Add Participants</label>
-    <input
-      type="text"
-      id="group-participants"
-      placeholder="Search and add participants"
-    />
-    <div id="participants-list">
-      <!-- Dynamically populated -->
+          <button id="open-create-group" class="btn-primary"> Create Group &ThinSpace;<i
+              class="fa-solid fa-square-plus" aria-hidden="true"></i></button>
+        </div>
+        <ul class="group-list">
+
+        </ul>
+
+      </div>
+      <!-- Chat Window -->
+      <div class="chat-window">
+        <div class="chat-header" id="groupName">
+          <h3 class="groupname" >
+          <!-- Dynamic Content -->
+          </h3>
+        </div>
+        <div class="chat-messages">
+        <!-- Dynamic content -->
+        </div>
+        <form class="chat-input" id="sendmsg">
+          <input type="text" id="msg" placeholder="Type a message..." required />
+          <button type="submit"><i class="fas fa-paper-plane"></i> Send</button>
+        </form>
+      </div>
     </div>
-    <div id="selected-participants">
-    <!-- Dynamically populated-->
+  </div>
+
+  <!-- Code for popup modal create group-->
+
+  <div id="modal-overlay" class="hidden" role="dialog" aria-hidden="true"></div>
+  <div id="create-group-container" class="create-group">
+    <div class="create-group-header">
+      <h2>Create New Group</h2>
+      <button id="close-create-group" class="close-btn">&times;</button>
+    </div>
+    <div class="create-group-body">
+      <!-- Group Name Input -->
+      <label for="group-name">Group Name</label>
+      <input type="text" id="group-name" placeholder="Enter group name" required />
+
+      <!-- Group Participants -->
+      <label for="group-participants">Add Participants</label>
+      <input type="text" id="group-participants" placeholder="Search and add participants" />
+      <div id="participants-list">
+        <!-- Dynamically populated -->
+      </div>
+      <div id="selected-participants">
+        <!-- Dynamically populated-->
+      </div>
+    </div>
+    <div class="create-group-footer">
+      <button id="create-group-btn" class="btn-primary">Create Group</button>
     </div>
   </div>
-  <div class="create-group-footer">
-    <button id="create-group-btn" class="btn-primary">Create Group</button>
-  </div>
-</div>
 
-<script defer type="module" src="/js/chat.js"></script>
+ <!-- Code for popup modal userlist -->
+  <div class="hidden" id ="popup">
+    <div id="popup-content">
+    <h3>Group Memebers</h3>
+    <ul id="user-list"></ul>
+    <button id="close-popup">Close</button>
+    </div>
+  </div>
+ 
+  <script defer type="module" src="/js/chat.js"></script>
 </body>
+
 </html>
