@@ -1,5 +1,6 @@
 import { io } from "https://cdn.socket.io/4.8.1/socket.io.esm.min.js";
 
+
 document.addEventListener("DOMContentLoaded", () => {
   //html elements selected by selectors
   const chatMessages = document.querySelector(".chat-messages");
@@ -244,9 +245,9 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         const olderMessages = await response.json();
-        console.log(olderMessages);
+       
         if (!Array.isArray(olderMessages) || olderMessages.length === 0) {
-          console.log("No older messages found.");
+        
           isLoading = false;
           return;
         }
@@ -405,6 +406,32 @@ document.addEventListener("DOMContentLoaded", () => {
 
       if (scrollToBottom) chatMessages.scrollTop = chatMessages.scrollHeight;
     }
+    
+    async removeMember(group_id,user_id){
+    //code to remove user from current group
+    try {
+      const response = await fetch(`${SERVER_URL}/chatapp/groups/removeUser`,{
+      
+      method:"POST",
+      headers:{
+      "Content-type":"application/json",
+      },
+      body:JSON.stringify({
+        group_id,
+        user_id
+      }),
+      });
+      return await response.json();
+    } catch (error) {
+      console.log(error);
+    }
+    
+    }
+    makeUserAdmin(group_id,user_id){
+    //code to make and user admin of current group
+    
+    
+    }
   }
 
   const chat = new Chat();
@@ -482,14 +509,16 @@ document.addEventListener("DOMContentLoaded", () => {
       const span = document.createElement('span');
        span.textContent =`${member.userName} ${member.isAdmin ? "(Admin)" : "(Member)"}`;
        listitem.appendChild(span);
-      //  console.log(member.isAdmin);
-       console.log(isLoggedInUserAdmin);
       if(isLoggedInUserAdmin && !member.isAdmin){
-      console.log('creating remove ')
         const removeButton = document.createElement("button");
+        const makeAdminButton = document.createElement("button");
+        makeAdminButton.textContent="Make Admin";
         removeButton.textContent = "Remove";
         removeButton.className = "remove-btn";
-        removeButton.onclick = () => removeMember(group_id, member.userId);
+        makeAdminButton.className="make-admin";
+        removeButton.onclick = () => chat.removeMember(group_id, member.userId);
+        makeAdminButton.onclick=()=> chat.makeUserAdmin(group_id,member.userId);
+        listitem.appendChild(makeAdminButton);
         listitem.appendChild(removeButton);
       }
       userlist.appendChild(listitem);

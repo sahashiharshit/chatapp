@@ -93,5 +93,18 @@ class GroupService{
       console.log(error);
     }
   }
+  async removeUser(group_id,user_id){
+  try {
+    const result = await GroupMembers.destroy({
+    
+    where:{group_id:group_id, user_id:user_id}
+    });
+    if(!result) throw new Error('User not removed from group');
+    return result;
+  } catch (error) {
+    throw new Error('Problem deleting user from group');
+  }
+  }
+  
 }
 export default new GroupService();

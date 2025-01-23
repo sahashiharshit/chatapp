@@ -457,24 +457,104 @@ padding-bottom: 0.5rem;
   align-items: center;
 }
 #popup-content {
-  background: white;
+  background: #ffffff;
+  border-radius: 12px;
   padding: 20px;
-  border-radius: 5px;
-  text-align: center;
-  width: 300px;
+  width: 400px;
+  max-width: 90%;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  animation: fadeIn 0.3s ease-in-out;
+  
 }
-
+#popup-content h3 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: bold;
+  color: #333333;
+  text-align: center;
+  margin-bottom: 20px;
+}
 #user-list {
   list-style: none;
   padding: 0;
+  margin: 0;
+  max-height: 300px;
+  overflow-y: auto;
+  border-top: 1px solid #eaeaea;
 }
 
 #user-list li {
   display: flex;
   justify-content: space-between;
-  margin: 5px 0;
+  align-items: center;
+  padding: 10px;
+  border-bottom: 1px solid #eaeaea;
+}
+#user-list li:last-child {
+  border-bottom: none;
+}
+#user-list li span {
+  font-size: 16px;
+  color: #444;
+  font-weight: 500;
 }
 
+.remove-btn {
+  background-color: #ff4d4f;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 5px 10px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.make-admin{
+  background-color: #25d366;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 5px 10px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.remove-btn:hover {
+  background-color: #d9363e;
+}
+.make-admin:hover {
+background-color: #25d344;
+}
+/* Close Button */
+#close-popup {
+  display: block;
+  margin: 20px auto 0;
+  padding: 10px 20px;
+  font-size: 16px;
+  color: white;
+  background-color: #007bff;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  text-align: center;
+  transition: background-color 0.3s ease;
+}
+
+#close-popup:hover {
+  background-color: #0056b3;
+}
+
+/* Animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 @media (max-width: 768px) {
   .bottom-flex-container {
     flex-direction: column;

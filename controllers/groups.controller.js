@@ -75,6 +75,15 @@ constructor(){
     }
     
     }
+    this.removeUser=async(req,res)=>{
+    const {group_id,user_id}= req.body;
+    try {
+        const removeUser = await GroupService.removeUser(group_id,user_id);
+        res.status(200).json(removeUser);
+    } catch (error) {
+        res.status(500).json(error);
+    }
+    }
 
 }
 
