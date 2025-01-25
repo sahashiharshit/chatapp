@@ -23,7 +23,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let isLoading = false;
   let selectedGroupId = null;
 
-  const SERVER_URL = "http://localhost:3000";
+  const SERVER_URL = "http://3.6.134.76:3000"||"http://localhost:3000";
   //Utility functions
   const debounce = (func, delay) => {
     let timer;

@@ -4,7 +4,7 @@ import { io } from "https://cdn.socket.io/4.8.1/socket.io.esm.min.js";
 
 document.addEventListener("DOMContentLoaded", () => {
  
-  const SERVER_URL = "http://localhost:3000";
+  const SERVER_URL ="http://3.6.134.76:3000"||"http://localhost:3000";
 
   class Login {
     constructor() {
@@ -39,7 +39,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const token = data.token;
         const user_id = data.user.id;
         if (response.ok) {
-          const socket = io('http://localhost:3000');
+          const socket = io(SERVER_URL);
           
           alert("Login Successful");
           socket.on('connect',()=>{
