@@ -1,5 +1,7 @@
-class SignUp{
 
+const SERVER_URL = "http://localhost:3000";
+class SignUp{
+  
     constructor(){
     
     }
@@ -14,7 +16,7 @@ class SignUp{
         }
         try {
           const response = await fetch(
-            "http://localhost:3000/chatapp/auth/create-new-user",
+            `${SERVER_URL}/chatapp/auth/create-new-user`,
             {
               method: "POST",
               headers: {

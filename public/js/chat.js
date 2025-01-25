@@ -1,25 +1,28 @@
 import { io } from "https://cdn.socket.io/4.8.1/socket.io.esm.min.js";
 
-
 document.addEventListener("DOMContentLoaded", () => {
   //html elements selected by selectors
   const chatMessages = document.querySelector(".chat-messages");
   const openCreateGroup = document.getElementById("open-create-group");
   const closeCreateGroup = document.getElementById("close-create-group");
-  const createGroupContainer = document.getElementById("create-group-container");
+  const createGroupContainer = document.getElementById(
+    "create-group-container"
+  );
   const createGroupBtn = document.getElementById("create-group-btn");
   const modalOverlay = document.getElementById("modal-overlay");
   const participantsInput = document.getElementById("group-participants");
   const participantsList = document.getElementById("participants-list");
   const selectedList = document.getElementById("selected-participants");
   const groupName = document.getElementById("groupName");
-  const closePopupButton = document.getElementById("close-popup"); 
+  const backToChats = document.getElementById("back-to-chats");
+  const groupDetails = document.getElementById("group-details");
+  const chat_section = document.querySelector('.chat-window');
   //
   //variables
   let grouptemporaryParticipants = [];
   let isLoading = false;
   let selectedGroupId = null;
-  
+
   const SERVER_URL = "http://localhost:3000";
   //Utility functions
   const debounce = (func, delay) => {
@@ -81,7 +84,7 @@ document.addEventListener("DOMContentLoaded", () => {
         alert("Unable to fetch groups. Please try again later.");
       }
     }
-  //Joingroup method
+    //Joingroup method
     async joinGroup(groupid, loggedInuserId) {
       selectedGroupId = groupid;
 
@@ -103,19 +106,17 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
 
-    async getUsersList(group_id,loggedInuserId){
-      
+    async getUsersList(group_id, loggedInuserId) {
       try {
-        const response=await fetch(`${SERVER_URL}/chatapp/groups/getUsers/${group_id}/${loggedInuserId}`);
+        const response = await fetch(
+          `${SERVER_URL}/chatapp/groups/getUsers/${group_id}/${loggedInuserId}`
+        );
         const data = await response.json();
 
         return data;
       } catch (error) {
         console.log(error);
       }
-      
-      
-    
     }
 
     //function to display messages
@@ -127,10 +128,9 @@ document.addEventListener("DOMContentLoaded", () => {
         groupname.innerHTML = "";
         chatMessages.innerHTML = `<p class='errornomsg'>No messages in the group yet</p>`;
       } else {
-        
         const groupname = document.querySelector(".groupname");
         groupname.textContent = `${this.messages[0].Group.groupname}`;
-        groupname.setAttribute('id',`${this.messages[0].group_id}`);
+        groupname.setAttribute("id", `${this.messages[0].group_id}`);
 
         this.messages
           .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
@@ -162,7 +162,6 @@ document.addEventListener("DOMContentLoaded", () => {
       if (scrollToBottom) {
         chatMessages.scrollTop = chatMessages.scrollHeight;
       }
-
     }
 
     //Function to fetch messages
@@ -245,9 +244,8 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         const olderMessages = await response.json();
-       
+
         if (!Array.isArray(olderMessages) || olderMessages.length === 0) {
-        
           isLoading = false;
           return;
         }
@@ -352,7 +350,7 @@ document.addEventListener("DOMContentLoaded", () => {
             groupparticipantsList: groupparticipantsList,
           }),
         });
-        console.log(await response.json());
+  
       } catch (error) {
         console.error(error);
       }
@@ -406,31 +404,52 @@ document.addEventListener("DOMContentLoaded", () => {
 
       if (scrollToBottom) chatMessages.scrollTop = chatMessages.scrollHeight;
     }
-    
-    async removeMember(group_id,user_id){
-    //code to remove user from current group
-    try {
-      const response = await fetch(`${SERVER_URL}/chatapp/groups/removeUser`,{
+
+    async removeMember(group_id, user_id) {
+      //code to remove user from current group
+      try {
+        const response = await fetch(
+          `${SERVER_URL}/chatapp/groups/removeUser`,
+          {
+            method: "POST",
+            headers: {
+              "Content-type": "application/json",
+            },
+            body: JSON.stringify({
+              group_id,
+              user_id,
+            }),
+          }
+        );
+        const result = await response.json();
+
+        return result;
+      } catch (error) {
+        console.log(error);
+      }
+    }
+    async makeUserAdmin(group_id, user_id) {
+      //code to make and user admin of current group
+      try {
+        const response = await fetch(
+          `${SERVER_URL}/chatapp/groups/makeUserAdmin`,
+          {
+            method: "POST",
+            headers: {
+              "Content-type": "application/json",
+            },
+            body: JSON.stringify({
+              group_id,
+              user_id,
+            }),
+          }
+        );
+        const result = await response.json();
       
-      method:"POST",
-      headers:{
-      "Content-type":"application/json",
-      },
-      body:JSON.stringify({
-        group_id,
-        user_id
-      }),
-      });
-      return await response.json();
-    } catch (error) {
-      console.log(error);
-    }
-    
-    }
-    makeUserAdmin(group_id,user_id){
-    //code to make and user admin of current group
-    
-    
+        return result;
+      } catch (error) {
+        console.error(error);
+      }
     }
   }
 
@@ -449,10 +468,10 @@ document.addEventListener("DOMContentLoaded", () => {
     query: { socketId, loggedInuserId },
   });
   socket.on("connect", () => {
-    console.log("Connected with socket ID:", socket.id);
+    //console.log("Connected with socket ID:", socket.id);
   });
   socket.on("socketIdUpdated", ({ socketId }) => {
-    console.log("Updated Socket ID:", socketId);
+    //console.log("Updated Socket ID:", socketId);
   });
 
   chat.getGroups(loggedInuserId);
@@ -488,50 +507,81 @@ document.addEventListener("DOMContentLoaded", () => {
   );
 
   //Open and close userlist popup
-  groupName.addEventListener("click",async()=>{
-    const popup = document.getElementById('popup');
-    const userlist = document.getElementById('user-list');
-    const groupname = document.querySelector('.groupname');
-    const group_id= groupname.getAttribute('id');
-    if(groupname.innerText==""){
-      
+  groupName.addEventListener("click", async () => {
+   
+    const userlist = document.getElementById("user-list");
+    const groupname = document.querySelector(".groupname");
+    const group_id = groupname.getAttribute("id");
+    if (groupname.innerText == "") {
       return;
     }
-      popup.classList.remove='hidden';
-      popup.style.display='flex';
-      
-      const users = await chat.getUsersList(group_id,loggedInuserId);
-      const {members,isLoggedInUserAdmin} =users;
-      
-      userlist.innerHTML="";
-      members.forEach((member)=>{
-      const listitem = document.createElement('li');
-      const span = document.createElement('span');
-       span.textContent =`${member.userName} ${member.isAdmin ? "(Admin)" : "(Member)"}`;
-       listitem.appendChild(span);
-      if(isLoggedInUserAdmin && !member.isAdmin){
+   
+
+    const users = await chat.getUsersList(group_id, loggedInuserId);
+    const { members, isLoggedInUserAdmin } = users;
+
+    userlist.innerHTML = "";
+    members.forEach((member) => {
+      const listitem = document.createElement("li");
+      const span = document.createElement("span");
+      span.textContent = `${member.userName} ${
+        member.isAdmin ? "(Admin)" : "(Member)"
+      }`;
+      listitem.appendChild(span);
+      if (isLoggedInUserAdmin && !member.isAdmin) {
+        //Remove button logic
         const removeButton = document.createElement("button");
-        const makeAdminButton = document.createElement("button");
-        makeAdminButton.textContent="Make Admin";
         removeButton.textContent = "Remove";
         removeButton.className = "remove-btn";
-        makeAdminButton.className="make-admin";
-        removeButton.onclick = () => chat.removeMember(group_id, member.userId);
-        makeAdminButton.onclick=()=> chat.makeUserAdmin(group_id,member.userId);
+        removeButton.onclick = async () => {
+          if (confirm("Do you want to remove this user?")) {
+            const sucess = await chat.removeMember(group_id, member.userId);
+            if (sucess) {
+              listitem.remove();
+            } else {
+              alert("Failed to remove user! try again later");
+            }
+          } else {
+            return;
+          }
+        };
+        //make admin button logic
+        const makeAdminButton = document.createElement("button");
+        makeAdminButton.textContent = "Make Admin";
+        makeAdminButton.className = "make-admin";
+        makeAdminButton.onclick = async () => {
+          if (confirm("Do you want to make this member an admin?")) {
+            const sucess = await chat.makeUserAdmin(group_id, member.userId);
+            if (sucess) {
+              alert("User has been successfully made an admin.");
+              
+              const memberLabel =
+                makeAdminButton.parentNode.querySelector("span");
+              if (memberLabel) {
+                memberLabel.textContent = `${member.userName} (Admin)`;
+              }
+              // Remove the "Make Admin" button as it's no longer relevant
+              makeAdminButton.remove();
+              removeButton.remove();
+            } else alert("Failed to update user status");
+          } else {
+            return;
+          }
+        };
         listitem.appendChild(makeAdminButton);
         listitem.appendChild(removeButton);
       }
       userlist.appendChild(listitem);
-      }); 
-      
-     });
-    closePopupButton.addEventListener('click',()=>{
-    
-    const popup = document.getElementById('popup');
-    popup.style.display='none';
-    popup.classList.add='hidden';
     });
+    chat_section.classList.add('hidden');
+    groupDetails.classList.remove('hidden');
     
+  });
+  //back to chat button
+  backToChats.addEventListener("click", () => {
+    groupDetails.classList.add("hidden");
+    chat_section.classList.remove("hidden");
+  });
   //To open and close popup
   openCreateGroup.addEventListener("click", () => {
     createGroupContainer.style.display = "flex";
@@ -583,9 +633,7 @@ document.addEventListener("DOMContentLoaded", () => {
       loggedInuserId,
       grouptemporaryParticipants
     );
-
-    console.log("Group created Success");
-
+    
     // Close the modal
     createGroupContainer.style.display = "none";
     modalOverlay.classList.add("hidden");

@@ -54,9 +54,16 @@
           <button type="submit"><i class="fas fa-paper-plane"></i> Send</button>
         </form>
       </div>
+      <!-- Code for  modal userlist -->
+      <div class="hidden group-details" id ="group-details">
+        <button id="back-to-chats">Back to Chats</button>
+        <h3>Group Memebers</h3>
+        <ul id="user-list"></ul>
+      </div>
     </div>
   </div>
-
+  
+ 
   <!-- Code for popup modal create group-->
 
   <div id="modal-overlay" class="hidden" role="dialog" aria-hidden="true"></div>
@@ -85,14 +92,8 @@
     </div>
   </div>
 
- <!-- Code for popup modal userlist -->
-  <div class="hidden" id ="popup">
-    <div id="popup-content">
-    <h3>Group Memebers</h3>
-    <ul id="user-list"></ul>
-    <button id="close-popup">Close</button>
-    </div>
-  </div>
+ 
+  
  
   <script defer type="module" src="/js/chat.js"></script>
 </body>

@@ -4,6 +4,7 @@ import { io } from "https://cdn.socket.io/4.8.1/socket.io.esm.min.js";
 
 document.addEventListener("DOMContentLoaded", () => {
  
+  const SERVER_URL = "http://localhost:3000";
 
   class Login {
     constructor() {
@@ -22,7 +23,7 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
       try {
-        const response = await fetch("http://localhost:3000/chatapp/auth/login", {
+        const response = await fetch(`${SERVER_URL}/chatapp/auth/login`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

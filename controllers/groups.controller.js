@@ -84,6 +84,16 @@ constructor(){
         res.status(500).json(error);
     }
     }
+    
+    this.makeUserAdmin = async(req,res)=>{
+        const {group_id,user_id}= req.body;
+        try {
+            const updateStatus = await GroupService.updateUserStatus(group_id,user_id);
+            res.status(200).json(updateStatus);
+        } catch (error) {
+            res.status(500).json(error);
+        }
+    }
 
 }
 

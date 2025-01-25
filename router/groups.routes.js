@@ -9,4 +9,5 @@ groupsRouter.get('/:userId/groups',groupsController.getGroups);
 groupsRouter.get('/search-participants',groupsController.searchUser);
 groupsRouter.get('/getUsers/:group_id/:loggedInUserId',groupsController.getUsersByGroupName);
 groupsRouter.post('/removeUser',groupsController.removeUser);
+groupsRouter.post('/makeUserAdmin',groupsController.makeUserAdmin);
 export default groupsRouter;

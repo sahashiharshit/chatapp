@@ -179,7 +179,8 @@ padding-bottom: 0.5rem;
 }
 
 /* Chat Window Styles */
-.chat-window {
+.chat-window
+{
 	flex: 0.7; /* Take equal width */
 	height: 100%;
 	display: flex; /* Ensure it works as a container for dynamic content */
@@ -384,7 +385,45 @@ padding-bottom: 0.5rem;
 .hidden {
   display: none;
 }
+.chat-window,
+.group-details{
+padding: 16px;
 
+}
+.group-details{
+
+flex: 0.7; /* Take equal width */
+height: 100%; /* Ensure it works as a container for dynamic content */
+flex-direction: column;
+background-color: whitesmoke; /* Ensure a consistent background color */
+padding: 0.5rem;
+box-sizing: border-box; /* Include padding in dimensions */
+overflow-y: auto;
+}
+.group-details h3{
+margin-bottom: 12px;
+}
+.group-details ul{
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  max-height: 300px;
+  overflow-y: auto;
+  border-top: 1px solid #eaeaea;
+}
+.group-details li{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  border-bottom: 1px solid #eaeaea;
+}
+.group-details li span{
+font-weight: bold;
+font-size: 16px;
+color: #444;
+font-weight: 500;
+}
 #participants-list {
   margin-top: 10px;
   border: 1px solid #ddd;
@@ -445,59 +484,13 @@ padding-bottom: 0.5rem;
   white-space: nowrap;
   padding: 5px;
 }
-#popup{
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: none;
-  justify-content: center;
-  align-items: center;
-}
-#popup-content {
-  background: #ffffff;
-  border-radius: 12px;
-  padding: 20px;
-  width: 400px;
-  max-width: 90%;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-  animation: fadeIn 0.3s ease-in-out;
-  
-}
-#popup-content h3 {
-  margin: 0;
-  font-size: 20px;
-  font-weight: bold;
-  color: #333333;
-  text-align: center;
-  margin-bottom: 20px;
-}
-#user-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  max-height: 300px;
-  overflow-y: auto;
-  border-top: 1px solid #eaeaea;
-}
 
-#user-list li {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px;
-  border-bottom: 1px solid #eaeaea;
-}
+
+
 #user-list li:last-child {
   border-bottom: none;
 }
-#user-list li span {
-  font-size: 16px;
-  color: #444;
-  font-weight: 500;
-}
+
 
 .remove-btn {
   background-color: #ff4d4f;
@@ -526,23 +519,6 @@ padding-bottom: 0.5rem;
 background-color: #25d344;
 }
 /* Close Button */
-#close-popup {
-  display: block;
-  margin: 20px auto 0;
-  padding: 10px 20px;
-  font-size: 16px;
-  color: white;
-  background-color: #007bff;
-  border: none;
-  border-radius: 10px;
-  cursor: pointer;
-  text-align: center;
-  transition: background-color 0.3s ease;
-}
-
-#close-popup:hover {
-  background-color: #0056b3;
-}
 
 /* Animation */
 @keyframes fadeIn {

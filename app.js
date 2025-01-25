@@ -33,7 +33,7 @@ app.use(express.json());
 app.use(
   cors({
     origin: (origin, callback) => {
-      const allowedOrigins = ["http://127.0.0.1:3000", "http://localhost:3000"];
+      const allowedOrigins = ["http://127.0.0.1:3000", "http://localhost:3000","http://3.6.134.76:3000"];
 
       if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true);

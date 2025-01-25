@@ -105,6 +105,19 @@ class GroupService{
     throw new Error('Problem deleting user from group');
   }
   }
+  async updateUserStatus(group_id,user_id){
+    try {
+      const result = await GroupMembers.update(
+      {isAdmin:true},
+      {
+        where:{group_id:group_id,user_id:user_id},
+        
+      });
+      return result;
+    } catch (error) {
+      throw new Error('Problem updating user stauts');
+    }
   
+  }
 }
 export default new GroupService();
