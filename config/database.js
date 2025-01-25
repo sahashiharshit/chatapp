@@ -1,9 +1,9 @@
 import { Sequelize } from "sequelize";
-import { configDotenv } from "dotenv";
+//import { configDotenv } from "dotenv";
 
-configDotenv();
+//configDotenv();
 export const dbconnection = new Sequelize({
-    dialect:process.env.DB_DIALECT,
+    dialect:process.env.DB_DIALECT||'mysql',
     host:process.env.RDS_ENDPOINT||'localhost',
     username:process.env.DB_USER||'harshit',
     password:process.env.DB_PASSWORD||'4202',
