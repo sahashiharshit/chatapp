@@ -108,7 +108,7 @@ html {
   opacity: 0;
   transition: opacity 0.3s;
   white-space: nowrap;
-  aria-live: polite;
+  
 }
 .button-container:hover .tooltip {
   visibility: visible;
@@ -520,19 +520,65 @@ background-color: #25d344;
 }
 /* Close Button */
 
-/* Animation */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-20px);
+
+
+
+
+
+
+
+/* Responsive Design */
+@media (max-width: 480px) {
+  #group-list {
+      display: none;
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+
+  #message-list {
+      padding: 0.5em;
+  }
+
+  .group-item {
+      font-size: 0.9em;
+  }
+
+  .message-item {
+      font-size: 0.8em;
   }
 }
-@media (max-width: 768px) {
-  .bottom-flex-container {
-    flex-direction: column;
+
+@media (min-width: 481px) and (max-width: 1024px) {
+  #group-list {
+      width: 30%;
+  }
+
+  #message-list {
+      width: 70%;
+  }
+
+  .group-item {
+      font-size: 1em;
+  }
+
+  .message-item {
+      font-size: 0.9em;
   }
 }
+
+@media (min-width: 1025px) {
+  #group-list {
+      width: 25%;
+  }
+
+  #message-list {
+      width: 75%;
+  }
+
+  .group-item {
+      font-size: 1.1em;
+  }
+
+  .message-item {
+      font-size: 1em;
+  }
+}
+

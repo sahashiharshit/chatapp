@@ -370,14 +370,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
 
-    getQueryParam(param) {
-      const urlParams = new URLSearchParams(window.location.search);
-      return urlParams.get(param);
-    }
-    decodeQueryParams(data) {
-      const decodedData = atob(data);
-      return new URLSearchParams(decodedData);
-    }
+   
     displayInstantMessages(message, loggedInuserId, scrollToBottom = true) {
       const messageElement = document.createElement("div");
       let date = new Date(message.timestamp);
@@ -461,7 +454,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const socketId = params.get("socketId");
   const data = localStorage.getItem(`${loggedInuserId}_data`);
   if (!socketId || !loggedInuserId || !data) {
-    alert("Invalid session. Please log in again.");
+   
     chat.navigate("login.html"); // Redirect to login
   }
   const socket = io(SERVER_URL, {
