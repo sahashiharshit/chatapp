@@ -9,13 +9,18 @@ class GroupManager {
 
     async fetchGroups(userId) {
         try {
-            return await fetchData(`${this.apiBaseUrl}/chatapp/groups/${userId}/groups`, {
-                
-            });
+            return await fetchData(`${this.apiBaseUrl}/chatapp/groups/${userId}/groups`);
+            
         } catch (error) {
             console.error("Error fetching groups:", error);
-            return [];
+            
         }
+    }
+    async fetchParticipants(query, userId){
+    const response=await fetch(`${this.apiBaseUrl}/chatapp/groups/search-participants?query=${encodeURIComponent(query)}&userId=${encodeURIComponent(userId)}`);
+    const participants = await response.json();
+    console.log('Participants:',participants);
+    return participants;
     }
 }
 

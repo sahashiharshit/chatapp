@@ -1,32 +1,24 @@
 import { fetchData } from "./Utilities.js";
 class MessageHandler{
-constructor(apiBaseUrl,token){
+constructor(apiBaseUrl,socket){
 this.apiBaseUrl= apiBaseUrl;
-this.token = token;
+this.socket= socket;
+
 }
 
-async fetchMessages(groupId){
+async fetchMessages(groupId,userId){
     try{
-        return await fetchData(`${this.apiBaseUrl}/groups/${groupId}/messages`,{
-            headers:{Authorization:`Bearer ${this.token}`},   
-        });
-    
+        return await fetchData(`${this.apiBaseUrl}/chatapp/chat/messages?groupId=${groupId}&userId=${userId}`);
+         
     }catch(error){
         console.error("Error fetching messages:",error);
-        return [];
     }
 }
 
-async sendMessage(groupId, text) {
+async sendMessage(groupId,userId, message) {
     try {
-        await fetchData(`${this.apiBaseUrl}/groups/${groupId}/messages`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${this.token}`,
-            },
-            body: JSON.stringify({ text }),
-        });
+        if(!message) return;
+        this.socket.emit("sendMessage",{groupId,userId,message});
     } catch (error) {
         console.error("Error sending message:", error);
     }

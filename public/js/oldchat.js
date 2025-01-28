@@ -272,7 +272,7 @@ document.addEventListener("DOMContentLoaded", () => {
     //function to send message to database
     async sendMessage(userId, message) {
       if (!message.trim()) return;
-      socket.emit("sendMessage", { groupId: selectedGroupId, userId, message });
+        socket.emit("sendMessage", { groupId: selectedGroupId, userId, message });
     }
     //For adding participant to a group
     addParticipantToList = (participant) => {

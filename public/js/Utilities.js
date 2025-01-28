@@ -14,7 +14,7 @@ if(callNow) func(...args);
 
 };
 
-export const sanitizeHTMl = (str)=>{
+export const sanitizeHTML = (str)=>{
     const parser = new DOMParser();
     const doc = parser.parseFromString(str,"text/html");
     return doc.body.textContent || '';
@@ -24,8 +24,10 @@ export const sanitizeHTMl = (str)=>{
 export const fetchData = async (url, options={})=>{
     try{
     const response = await fetch(url,options);
+    
     if(!response.ok) throw new Error(`HTTP Error: ${response.status}`);
-    return await response.json();
+    const data= await response.json();
+    return data;
     }
     catch(error){
     console.error("Fetch Error:",error);

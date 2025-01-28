@@ -51,6 +51,7 @@ constructor(){
         const {query,userId} = req.query;
         try {
             const users = await UserService.getUserByQuery(query,userId);
+            console.log("users are:",users);
             res.status(201).json(users);
         } catch (error) {
             res.status(500).json({ error: 'Failed to fetch participants' });

@@ -84,6 +84,7 @@ class UserService {
         attributes:['id','name']
         
         });
+        
         return users;
     } catch (error) {
         throw new Error('Failed to fetch participants');

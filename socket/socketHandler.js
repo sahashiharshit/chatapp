@@ -36,7 +36,7 @@ class SocketHandler {
       socket.on("sendMessage", async (data) => {
         try {
           const { groupId, userId, message } = data;
-          //const groupRoom = `group_${groupId}`;
+         
           const usersDetails = await UserService.getUserById(userId);
           const username = await usersDetails.toJSON();
 
