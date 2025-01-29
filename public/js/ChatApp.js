@@ -184,7 +184,7 @@ class ChatApp {
     this.messages = messages;
     
     if (this.messages.length === 0) {
-      groupName.innerHTML = groupname;
+      groupName.textContent = `${groupname}`;
       chatMessages.innerHTML = `<p class='errornomsg'>No messages in the group yet</p>`;
     } else {
       groupName.textContent = `${this.messages[0].Group.groupname}`;
