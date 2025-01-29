@@ -168,18 +168,18 @@ class ChatApp {
   async selectGroup(groupId) {
     this.selectedGroupId = groupId;
     this.socket.emit("join-group", this.selectedGroupId);
-    const data = await this.messageHandler.fetchMessages(
+    const {messages,groupname} = await this.messageHandler.fetchMessages(
       this.selectedGroupId,
       this.loggedinUserId
     );
-    this.renderMessages(data);
+    this.renderMessages(messages,groupname);
   }
 
   // Render messages in the chat
-  renderMessages(data, scrollToBottom = true) {
+  renderMessages(messages,groupname, scrollToBottom = true) {
     const { chatMessages, groupName } = this.cachedElements;
     chatMessages.innerHTML = "";
-    console.log(data);
+    console.log(messages,groupname);
     return;
     this.messages = data;
     //console.log(this.messages);

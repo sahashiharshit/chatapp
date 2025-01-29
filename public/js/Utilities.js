@@ -23,14 +23,22 @@ export const sanitizeHTML = (str)=>{
 
 export const fetchData = async (url, options={})=>{
     try{
-    const response = await fetch(url,options);
+    const defaultHeaders={
+    "Content-Type":"application/json",
+    ...(options.headers||{})
+    };
+    const response = await fetch(url,{...options,headers:defaultHeaders});
     
-    if(!response.ok) throw new Error(`HTTP Error: ${response.status}`);
-    const data= await response.json();
+    if (!response.ok) {
+        throw new Error(`HTTP Error: ${response.status} ${response.statusText}`);
+    }
+    const data = response.headers.get("content-type")?.includes("application/json")
+            ? await response.json()
+            : null;
     return data;
     }
     catch(error){
-    console.error("Fetch Error:",error);
+    console.error("Fetch Error:",error.message);
     throw error;
     }
 };
