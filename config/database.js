@@ -1,13 +1,13 @@
 import { Sequelize } from "sequelize";
-//import { configDotenv } from "dotenv";
+import { configDotenv } from "dotenv";
 
-//configDotenv();
+configDotenv();
 export const dbconnection = new Sequelize({
-    dialect:process.env.DB_DIALECT||'mysql',
-    host:process.env.RDS_ENDPOINT||'localhost',
-    username:process.env.DB_USER||'harshit',
-    password:process.env.DB_PASSWORD||'4202',
-    database:process.env.DB_NAME||'chatdb',
+    dialect:process.env.DB_DIALECT,
+    host:process.env.RDS_ENDPOINT,
+    username:process.env.DB_USER,
+    password:process.env.DB_PASSWORD,
+    database:process.env.DB_NAME,
     logging: console.log,
     
 });
