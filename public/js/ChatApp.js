@@ -179,11 +179,12 @@ class ChatApp {
   renderMessages(messages,groupname, scrollToBottom = true) {
     const { chatMessages, groupName } = this.cachedElements;
     chatMessages.innerHTML = "";
-    console.log(messages,groupname);
+    console.log(groupname);
     
     this.messages = messages;
     
     if (this.messages.length === 0) {
+      console.log(groupname);
       groupName.textContent = `${groupname}`;
       chatMessages.innerHTML = `<p class='errornomsg'>No messages in the group yet</p>`;
     } else {
