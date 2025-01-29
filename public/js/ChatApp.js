@@ -180,12 +180,11 @@ class ChatApp {
     const { chatMessages, groupName } = this.cachedElements;
     chatMessages.innerHTML = "";
     console.log(messages,groupname);
-    return;
-    this.messages = data;
-    //console.log(this.messages);
-
+    
+    this.messages = messages;
+    
     if (this.messages.length === 0) {
-      groupName.innerHTML = "";
+      groupName.innerHTML = groupname;
       chatMessages.innerHTML = `<p class='errornomsg'>No messages in the group yet</p>`;
     } else {
       groupName.textContent = `${this.messages[0].Group.groupname}`;

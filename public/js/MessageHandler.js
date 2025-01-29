@@ -16,8 +16,8 @@ class MessageHandler {
       if (!messages || !groupname)
         throw new Error("Failed to fetch messages or group name.");
 
-      console.log("Messages:", messages);
-      console.log("Group Name:", groupname);
+    //   console.log("Messages:", messages);
+    //   console.log("Group Name:", groupname);
 
       return { groupname, messages };
     } catch (error) {
