@@ -65,6 +65,7 @@ class DataService {
     if (!groupId || !userId) {
       throw new Error("Group ID and User ID are required.");
   }
+  
     const isMember = await GroupMembers.findOne({
       where: { group_id: groupId, user_id: userId },
     });

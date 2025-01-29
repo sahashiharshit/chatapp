@@ -19,8 +19,28 @@ class GroupManager {
     async fetchParticipants(query, userId){
     const response=await fetch(`${this.apiBaseUrl}/chatapp/groups/search-participants?query=${encodeURIComponent(query)}&userId=${encodeURIComponent(userId)}`);
     const participants = await response.json();
-    console.log('Participants:',participants);
+   
     return participants;
+    }
+    
+    async createNewGroup(groupname,loggedInuserId,grouptemporaryParticipants){
+        try {
+            const response = await fetch(`${this.apiBaseUrl}/chatapp/groups/`, {
+              method: "POST",
+              headers: {
+                "Content-type": "application/json",
+              },
+              body: JSON.stringify({
+                groupName: groupname,
+                createdBy: loggedInuserId,
+                groupparticipantsList:grouptemporaryParticipants,
+              }),
+            });
+          const result = await response.json();
+          return result;
+          } catch (error) {
+            console.error(error);
+          }
     }
 }
 

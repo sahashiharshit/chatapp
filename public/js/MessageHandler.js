@@ -8,8 +8,10 @@ this.socket= socket;
 
 async fetchMessages(groupId,userId){
     try{
-        return await fetchData(`${this.apiBaseUrl}/chatapp/chat/messages?groupId=${groupId}&userId=${userId}`);
-         
+        const messages= await fetchData(`${this.apiBaseUrl}/chatapp/chat/messages?groupId=${groupId}&userId=${userId}`);
+        const groupname= await fetchData(`${this.apiBaseUrl}/chatapp/groups/groupname/${groupId}`);
+        console.log(groupname);
+        return [groupname,messages];
     }catch(error){
         console.error("Error fetching messages:",error);
     }

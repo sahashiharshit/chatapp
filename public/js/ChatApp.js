@@ -34,7 +34,7 @@ class ChatApp {
 
       participantList: document.querySelector("#participants-list"),
       selectedList: document.querySelector("#selected-participants"),
-      groupName: document.querySelector("#groupName"),
+      groupName: document.querySelector("#group-name"),
       backToChats: document.querySelector("#back-to-chats"),
       groupDetails: document.querySelector("#group-details"),
       chat_section: document.querySelector(".chat-window"),
@@ -89,17 +89,24 @@ class ChatApp {
     participantList.innerHTML='';
     return;
     }
-    const participants=await this.fetchParticipants(query,this.loggedinUserId);
+    const participants = await this.fetchParticipants(query);
     this.displayParticipantList(participants);
     });
     
-    createGroupBtn.addEventListener("click", async () => {
-      const groupname= sanitizeHTML(groupName.value.trim());
+    createGroupBtn.addEventListener("click", async (e) => {
+      e.preventDefault();
+      const groupname = sanitizeHTML(groupName.value.trim());
       if(!groupname||this.grouptemporaryParticipants.length===0){
         alert("Please provide a group name and add at least one participant.");
         return;
       }
-     await saveGroupInfo(groupname,this.loggedinUserId,this.grouptemporaryParticipants);
+     const response = await this.saveGroupInfo(groupname,this.grouptemporaryParticipants);
+    // console.log(response);
+     if(!response){
+      return;
+     
+     
+     }
      createGroupContainer.style.display='none';
      modalOverlay.classList.add('hidden');
      groupName.value='';
@@ -108,7 +115,8 @@ class ChatApp {
      participantsInput.value = "";
      this.grouptemporaryParticipants = [];
      await this.fetchGroups();
-    });
+     
+     });
     backToChats.addEventListener("click", () => {});
     groupName.addEventListener("click", async () => {});
     chatMessages.addEventListener("scroll", () => {});
@@ -160,18 +168,20 @@ class ChatApp {
   async selectGroup(groupId) {
     this.selectedGroupId = groupId;
     this.socket.emit("join-group", this.selectedGroupId);
-    const messages = await this.messageHandler.fetchMessages(
+    const data = await this.messageHandler.fetchMessages(
       this.selectedGroupId,
       this.loggedinUserId
     );
-    this.renderMessages(messages);
+    this.renderMessages(data);
   }
 
   // Render messages in the chat
-  renderMessages(messages, scrollToBottom = true) {
+  renderMessages(data, scrollToBottom = true) {
     const { chatMessages, groupName } = this.cachedElements;
     chatMessages.innerHTML = "";
-    this.messages = messages;
+    console.log(data);
+    return;
+    this.messages = data;
     //console.log(this.messages);
 
     if (this.messages.length === 0) {
@@ -262,11 +272,12 @@ class ChatApp {
     }
   }
   
-  fetchParticipants=async(query,userId)=>{
-  const data = await this.groupManager.fetchParticipants();
-  console.log(data);
+  fetchParticipants=async(query)=>{
+  const data = await this.groupManager.fetchParticipants(query,this.loggedinUserId);
+
   return data;
   };
+  
   displayParticipantList=(participants)=>{
   //console.log(participants);
     const {participantList}= this.cachedElements;
@@ -279,11 +290,47 @@ class ChatApp {
         div.classList.add("participant-item");
 
         div.addEventListener("click", () => {
-          chat.addParticipantToList(participant);
+          this.addParticipantToList(participant);
         });
         participantList.appendChild(div);
       });
   };
+  
+  addParticipantToList=(participant)=>{
+  const {participantList,participantsInput,selectedList} = this.cachedElements;
+  
+  const participantDiv= document.createElement("div");
+  participantDiv.dataset.userId = participant.id;
+  this.grouptemporaryParticipants.push(participant.id);
+
+  participantDiv.innerHTML = `
+    ${participant.name}
+    <button class="remove-participant-btn">x</button>
+  `;
+  participantDiv
+    .querySelector(".remove-participant-btn")
+    .addEventListener("click", () => {
+      this.removeParticipants(participant.id);
+    });
+  selectedList.appendChild(participantDiv);
+  participantsInput.value = "";
+  participantList.innerHTML = "";
+  }
+  
+  removeParticipants=(id)=>{
+    const participantItem = document.querySelector(`[data-user-id="${id}"]`);
+    if (participantItem) participantItem.remove();
+
+    this.grouptemporaryParticipants = this.grouptemporaryParticipants.filter(
+      (participant) => participant.id !== id
+    );
+    this.grouptemporaryParticipants.pop(id);
+  }
+  
+  saveGroupInfo=async(groupname,grouptemporaryParticipants)=>{
+   return await this.groupManager.createNewGroup(groupname,this.loggedinUserId,grouptemporaryParticipants);
+  
+  }
   // Logout user
   logout() {
     localStorage.removeItem(this.loggedinUserId + "_data");

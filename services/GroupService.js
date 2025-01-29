@@ -119,5 +119,13 @@ class GroupService{
     }
   
   }
+  async getGroupName(groupId){
+    try {
+      const result = await Groups.findOne({where:{id:groupId}});
+      return result;
+    } catch (error) {
+      throw new Error('Group not found');
+    }
+  }
 }
 export default new GroupService();

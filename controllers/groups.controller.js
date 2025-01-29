@@ -32,6 +32,15 @@ constructor(){
     }
     
     }
+    this.getGroupById=async(req,res)=>{
+        try{
+            const {groupId}=req.params;
+            const groupname = await GroupService.getGroupName(groupId);
+            res.status(203).json(groupname);
+        }catch(error){
+            res.status(404).json({error});
+        }
+    }
     //function to get groups
     this.getGroups=async(req,res)=>{
     

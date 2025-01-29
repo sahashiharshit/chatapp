@@ -32,8 +32,6 @@ if(!socketId || !loggedInuserId || !data){
     chatapp.logout();
     return;
 }
-chatapp.initSocketEvents();
 chatapp.fetchGroups();
-chatapp.bindEventListeners();
 });
 
