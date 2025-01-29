@@ -172,20 +172,19 @@ class ChatApp {
       this.selectedGroupId,
       this.loggedinUserId
     );
-    this.renderMessages(messages,groupname);
+    this.renderMessages({messages,groupname});
   }
 
   // Render messages in the chat
-  renderMessages(messages,groupname, scrollToBottom = true) {
+  renderMessages(data, scrollToBottom = true) {
     const { chatMessages, groupName } = this.cachedElements;
     chatMessages.innerHTML = "";
-    console.log(groupname.groupname);
     
-    this.messages = messages;
+    
+    this.messages = data.messages;
     
     if (this.messages.length === 0) {
-      console.log(groupname);
-      groupName.textContent = groupname.groupname;
+      groupName.innerHTML = data.groupName;
       chatMessages.innerHTML = `<p class='errornomsg'>No messages in the group yet</p>`;
     } else {
       groupName.textContent = `${this.messages[0].Group.groupname}`;
@@ -265,12 +264,7 @@ class ChatApp {
     }
   }
 
-  // Receive a new message via WebSocket
-  receiveMessage(data) {
-    if (data.groupId === this.selectedGroupId) {
-      this.renderMessages([data]);
-    }
-  }
+  
   
   fetchParticipants=async(query)=>{
   const data = await this.groupManager.fetchParticipants(query,this.loggedinUserId);
