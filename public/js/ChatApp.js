@@ -182,7 +182,7 @@ class ChatApp {
     
     
     this.messages = data.messages;
-    
+    console.log(data.groupname);
     if (this.messages.length === 0) {
       groupName.innerHTML = data.groupName;
       chatMessages.innerHTML = `<p class='errornomsg'>No messages in the group yet</p>`;
