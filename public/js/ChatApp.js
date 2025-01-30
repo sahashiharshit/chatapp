@@ -133,8 +133,8 @@ class ChatApp {
       }
 
       const users = await this.groupManager.getUserlist(group_id, this.loggedinUserId);
-     // const { members, isLoggedInUserAdmin } = users;
-        console.log(users);
+      const { members, isLoggedInUserAdmin } = users;
+      console.log(users);
       userlist.innerHTML = "";
       members.forEach((member) => {
         const listitem = document.createElement("li");
