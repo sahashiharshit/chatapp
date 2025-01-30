@@ -1,4 +1,4 @@
-import { sanitizeHTML } from "./Utilities.js";
+import { fetchData, sanitizeHTML } from "./Utilities.js";
 import MessageHandler from "./MessageHandler.js";
 import GroupManager from "./GroupManager.js";
 //Chat application
@@ -31,10 +31,10 @@ class ChatApp {
       modalOverlay: document.querySelector("#modal-overlay"),
       participantsInput: document.querySelector("#group-participants"),
       groupList: document.querySelector(".group-list"),
-
       participantList: document.querySelector("#participants-list"),
       selectedList: document.querySelector("#selected-participants"),
       groupName: document.querySelector(".groupname"),
+      userlist : document.querySelector("#user-list"),
       backToChats: document.querySelector("#back-to-chats"),
       groupDetails: document.querySelector("#group-details"),
       chat_section: document.querySelector(".chat-window"),
@@ -59,6 +59,8 @@ class ChatApp {
       modalOverlay,
       participantList,
       selectedList,
+      chat_section,
+      groupDetails
     } = this.cachedElements;
 
     sendMessage.addEventListener("submit", (e) => {
@@ -117,8 +119,77 @@ class ChatApp {
       this.grouptemporaryParticipants = [];
       // await this.fetchGroups();
     });
-    backToChats.addEventListener("click", () => {});
-    groupName.addEventListener("click", async () => {});
+    backToChats.addEventListener("click", () => {
+      groupDetails.classList.add("hidden");
+      chat_section.classList.remove("hidden");
+    });
+    groupName.addEventListener("click", async () => {
+
+      const group_id = groupName.getAttribute("id");
+      if (groupName.innerText == "") {
+        return;
+      }
+
+      const users = await this.groupManager.getUserlist(group_id, this.loggedinUserId);
+      const { members, isLoggedInUserAdmin } = users;
+      userlist.innerHTML = "";
+      members.forEach((member) => {
+        const listitem = document.createElement("li");
+        const span = document.createElement("span");
+        span.textContent = `${member.userName} ${
+          member.isAdmin ? "(Admin)" : "(Member)"
+        }`;
+        listitem.appendChild(span);
+        if (isLoggedInUserAdmin && !member.isAdmin) {
+          //Remove button logic
+          const removeButton = document.createElement("button");
+          removeButton.textContent = "Remove";
+          removeButton.className = "remove-btn";
+          removeButton.onclick = async () => {
+            if (confirm("Do you want to remove this user?")) {
+              const sucess = await this.groupManager.removeMember(group_id, member.userId);
+              if (sucess) {
+                listitem.remove();
+              } else {
+                alert("Failed to remove user! try again later");
+              }
+            } else {
+              return;
+            }
+          };
+          //make admin button logic
+          const makeAdminButton = document.createElement("button");
+          makeAdminButton.textContent = "Make Admin";
+          makeAdminButton.className = "make-admin";
+          makeAdminButton.onclick = async () => {
+            if (confirm("Do you want to make this member an admin?")) {
+              const sucess = await this.groupManager.makeUserAdmin(group_id, member.userId);
+              if (sucess) {
+                alert("User has been successfully made an admin.");
+                
+                const memberLabel =
+                  makeAdminButton.parentNode.querySelector("span");
+                if (memberLabel) {
+                  memberLabel.textContent = `${member.userName} (Admin)`;
+                }
+                // Remove the "Make Admin" button as it's no longer relevant
+                makeAdminButton.remove();
+                removeButton.remove();
+              } else alert("Failed to update user status");
+            } else {
+              return;
+            }
+          };
+          listitem.appendChild(makeAdminButton);
+          listitem.appendChild(removeButton);
+        }
+        userlist.appendChild(listitem);
+      });
+      chat_section.classList.add('hidden');
+      groupDetails.classList.remove('hidden');
+      
+    
+    });
     chatMessages.addEventListener("scroll", () => {});
     logoutButton.addEventListener("click", () => this.logout());
   }
@@ -339,6 +410,8 @@ class ChatApp {
       grouptemporaryParticipants
     );
   };
+  
+  
   // Logout user
   logout() {
     localStorage.removeItem(this.loggedinUserId + "_data");

@@ -42,6 +42,51 @@ class GroupManager {
             console.error(error);
           }
     }
+    
+    async getUserlist(group_id,loggedInUserId){
+    try {
+      return await fetchData(`${this.apiBaseUrl}/chatapp/groups/getUsers/${group_id}/${loggedInUserId}`);
+      
+    } catch (error) {
+      console.log(error);
+    }
+    }
+    
+    async makeUserAdmin(group_id,user_id){
+    try {
+      return await fetchData(`${this.apiBaseUrl}/chatapp/groups/makeUserAdmin`,
+      {
+        method:"POST",
+        headers:{"Content-Type":"application/json",
+        },
+        body:JSON.stringify({group_id,user_id}),
+      }
+      );
+    } catch (error) {
+      console.error(error);
+    }
+    }
+    
+    async removeMember(group_id, user_id) {
+      //code to remove user from current group
+      try {
+        return await fetchData(
+          `${this.apiBaseUrl}/chatapp/groups/removeUser`,
+          {
+            method: "POST",
+            headers: {
+              "Content-type": "application/json",
+            },
+            body: JSON.stringify({
+              group_id,
+              user_id,
+            }),
+          }
+        );
+      } catch (error) {
+        console.log(error);
+      }
+    }
 }
 
 export default GroupManager;
