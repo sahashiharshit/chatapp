@@ -34,7 +34,7 @@ class ChatApp {
 
       participantList: document.querySelector("#participants-list"),
       selectedList: document.querySelector("#selected-participants"),
-      groupName: document.querySelector("#groupname"),
+      groupName: document.querySelector(".groupname"),
       backToChats: document.querySelector("#back-to-chats"),
       groupDetails: document.querySelector("#group-details"),
       chat_section: document.querySelector(".chat-window"),
