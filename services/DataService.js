@@ -74,7 +74,7 @@ class DataService {
         where: { group_id: groupId },
        include: [
        { model:User,as:'sender', attributes: ["name"] },
-       {model:Groups,attributes:['groupname']}
+       
        ],
         order: [["createdAt", "ASC"]],
       });

@@ -38,7 +38,7 @@ constructor(){
         try{
             const {groupId}=req.params;
             const groupname = await GroupService.getGroupName(groupId);
-            res.status(200).json({groupname});
+            res.status(200).json(groupname);
         }catch(error){
             console.error("Error fetching group:", error.message);
             res.status(404).json({error:error.message});

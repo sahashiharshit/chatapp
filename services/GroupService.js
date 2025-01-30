@@ -121,11 +121,11 @@ class GroupService{
   }
   async getGroupName(groupId){
     try {
-      const result = await Groups.findOne({where:{id:groupId},attributes:['groupname'],});
+      const result = await Groups.findOne({where:{id:groupId},});
       if(!result){
         throw new Error(`Group with ID ${groupId} not found`);
       }
-      return result.groupname;
+      return result;
     } catch (error) {
       console.error("Error fetching group name:", error.message);
       throw error;
