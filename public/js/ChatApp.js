@@ -7,11 +7,11 @@ class ChatApp {
     this.apiBaseUrl = apiBaseUrl;
     this.loggedinUserId = loggedinUserId;
     this.socket = socket;
-  
+
     this.selectedGroupId = null;
     this.cachedElements = this.cacheDOMElements();
     this.messages = [];
-    this.grouptemporaryParticipants=[];
+    this.grouptemporaryParticipants = [];
     // Initialize external modules
     this.messageHandler = new MessageHandler(this.apiBaseUrl, this.socket);
     this.groupManager = new GroupManager(this.apiBaseUrl);
@@ -58,7 +58,7 @@ class ChatApp {
       chatMessages,
       modalOverlay,
       participantList,
-      selectedList
+      selectedList,
     } = this.cachedElements;
 
     sendMessage.addEventListener("submit", (e) => {
@@ -71,52 +71,52 @@ class ChatApp {
     openCreateGroup.addEventListener("click", () => {
       createGroupContainer.style.display = "flex";
       modalOverlay.classList.remove("hidden");
-       participantList.innerHTML='';
+      participantList.innerHTML = "";
     });
     closeCreateGroup.addEventListener("click", () => {
-    createGroupContainer.style.display='none';
-    modalOverlay.classList.add('hidden');
-    groupName.value='';
-    
-    selectedList.innerHTML='';
-    participantsInput.innerHTML='';
-    this.grouptemporaryParticipants = [];
+      createGroupContainer.style.display = "none";
+      modalOverlay.classList.add("hidden");
+      groupName.value = "";
+
+      selectedList.innerHTML = "";
+      participantsInput.innerHTML = "";
+      this.grouptemporaryParticipants = [];
     });
-    
+
     participantsInput.addEventListener("input", async (event) => {
-    const query = event.target.value;
-    if(query.length<2){
-    participantList.innerHTML='';
-    return;
-    }
-    const participants = await this.fetchParticipants(query);
-    this.displayParticipantList(participants);
+      const query = event.target.value;
+      if (query.length < 2) {
+        participantList.innerHTML = "";
+        return;
+      }
+      const participants = await this.fetchParticipants(query);
+      this.displayParticipantList(participants);
     });
-    
+
     createGroupBtn.addEventListener("click", async (e) => {
       e.preventDefault();
       const groupname = sanitizeHTML(groupName.value.trim());
-      if(!groupname||this.grouptemporaryParticipants.length===0){
+      if (!groupname || this.grouptemporaryParticipants.length === 0) {
         alert("Please provide a group name and add at least one participant.");
         return;
       }
-     const response = await this.saveGroupInfo(groupname,this.grouptemporaryParticipants);
-    // console.log(response);
-     if(!response){
-      return;
-     
-     
-     }
-     createGroupContainer.style.display='none';
-     modalOverlay.classList.add('hidden');
-     groupName.value='';
-     participantList.innerHTML='';
-     selectedList.innerHTML = "";
-     participantsInput.value = "";
-     this.grouptemporaryParticipants = [];
-     await this.fetchGroups();
-     
-     });
+      const response = await this.saveGroupInfo(
+        groupname,
+        this.grouptemporaryParticipants
+      );
+      // console.log(response);
+      if (!response) {
+        return;
+      }
+      createGroupContainer.style.display = "none";
+      modalOverlay.classList.add("hidden");
+      groupName.value = "";
+      participantList.innerHTML = "";
+      selectedList.innerHTML = "";
+      participantsInput.value = "";
+      this.grouptemporaryParticipants = [];
+      await this.fetchGroups();
+    });
     backToChats.addEventListener("click", () => {});
     groupName.addEventListener("click", async () => {});
     chatMessages.addEventListener("scroll", () => {});
@@ -168,32 +168,34 @@ class ChatApp {
   async selectGroup(groupId) {
     this.selectedGroupId = groupId;
     this.socket.emit("join-group", this.selectedGroupId);
-    const {messages,groupname} = await this.messageHandler.fetchMessages(
+    const { messages, groupname } = await this.messageHandler.fetchMessages(
       this.selectedGroupId,
       this.loggedinUserId
     );
-    this.renderMessages({messages,groupname});
+    this.renderMessages({ messages, groupname });
   }
 
   // Render messages in the chat
   renderMessages(data, scrollToBottom = true) {
     const { chatMessages, groupName } = this.cachedElements;
     chatMessages.innerHTML = "";
-    
-    
-    this.messages = data.messages;
-    console.log(data.groupname);
+    this.messages = data.messages || [];
+
+    const groupnameText = data.groupname || "No Group";
+    groupName.textContent = groupnameText;
+
+    if (this.messages.length > 0) {
+      groupName.setAttribute("id", `${this.messages[0].group_id}`);
+    }
+
     if (this.messages.length === 0) {
-      groupName.innerHTML = data.groupname;
       chatMessages.innerHTML = `<p class='errornomsg'>No messages in the group yet</p>`;
     } else {
-      groupName.textContent = `${this.messages[0].Group.groupname}`;
-      groupName.setAttribute("id", `${this.messages[0].group_id}`);
       this.messages
         .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
-        .map((data) => {
+        .forEach((message) => {
           const messageElement = document.createElement("div");
-          let date = new Date(data.createdAt);
+          let date = new Date(message.createdAt);
           let localtime = date.toLocaleString(undefined, {
             year: "numeric",
             month: "short",
@@ -204,13 +206,13 @@ class ChatApp {
           });
           messageElement.classList.add(
             "message",
-            data.user_id === this.loggedinUserId ? "sent" : "received"
+            message.user_id === this.loggedinUserId ? "sent" : "received"
           );
           messageElement.innerHTML = `
-    <div class="username">${sanitizeHTML(data.sender.name)
+    <div class="username">${sanitizeHTML(message.sender.name)
       .charAt(0)
-      .toUpperCase()}${sanitizeHTML(data.sender.name.slice(1))}</div>
-    <p>${sanitizeHTML(data.message)}</p>
+      .toUpperCase()}${sanitizeHTML(message.sender.name.slice(1))}</div>
+    <p>${sanitizeHTML(message.message)}</p>
     <span class="timestamp">${localtime}</span>      
     `;
           chatMessages.appendChild(messageElement);
@@ -264,54 +266,56 @@ class ChatApp {
     }
   }
 
-  
-  
-  fetchParticipants=async(query)=>{
-  const data = await this.groupManager.fetchParticipants(query,this.loggedinUserId);
+  fetchParticipants = async (query) => {
+    const data = await this.groupManager.fetchParticipants(
+      query,
+      this.loggedinUserId
+    );
 
-  return data;
+    return data;
   };
-  
-  displayParticipantList=(participants)=>{
-  //console.log(participants);
-    const {participantList}= this.cachedElements;
+
+  displayParticipantList = (participants) => {
+    //console.log(participants);
+    const { participantList } = this.cachedElements;
     participantList.innerHTML = "";
-  
-      participants.map((participant) => {
-        const div = document.createElement("div");
-        div.textContent = participant.name;
-        div.dataset.userId = participant.id;
-        div.classList.add("participant-item");
 
-        div.addEventListener("click", () => {
-          this.addParticipantToList(participant);
-        });
-        participantList.appendChild(div);
+    participants.map((participant) => {
+      const div = document.createElement("div");
+      div.textContent = participant.name;
+      div.dataset.userId = participant.id;
+      div.classList.add("participant-item");
+
+      div.addEventListener("click", () => {
+        this.addParticipantToList(participant);
       });
+      participantList.appendChild(div);
+    });
   };
-  
-  addParticipantToList=(participant)=>{
-  const {participantList,participantsInput,selectedList} = this.cachedElements;
-  
-  const participantDiv= document.createElement("div");
-  participantDiv.dataset.userId = participant.id;
-  this.grouptemporaryParticipants.push(participant.id);
 
-  participantDiv.innerHTML = `
+  addParticipantToList = (participant) => {
+    const { participantList, participantsInput, selectedList } =
+      this.cachedElements;
+
+    const participantDiv = document.createElement("div");
+    participantDiv.dataset.userId = participant.id;
+    this.grouptemporaryParticipants.push(participant.id);
+
+    participantDiv.innerHTML = `
     ${participant.name}
     <button class="remove-participant-btn">x</button>
   `;
-  participantDiv
-    .querySelector(".remove-participant-btn")
-    .addEventListener("click", () => {
-      this.removeParticipants(participant.id);
-    });
-  selectedList.appendChild(participantDiv);
-  participantsInput.value = "";
-  participantList.innerHTML = "";
-  }
-  
-  removeParticipants=(id)=>{
+    participantDiv
+      .querySelector(".remove-participant-btn")
+      .addEventListener("click", () => {
+        this.removeParticipants(participant.id);
+      });
+    selectedList.appendChild(participantDiv);
+    participantsInput.value = "";
+    participantList.innerHTML = "";
+  };
+
+  removeParticipants = (id) => {
     const participantItem = document.querySelector(`[data-user-id="${id}"]`);
     if (participantItem) participantItem.remove();
 
@@ -319,12 +323,15 @@ class ChatApp {
       (participant) => participant.id !== id
     );
     this.grouptemporaryParticipants.pop(id);
-  }
-  
-  saveGroupInfo=async(groupname,grouptemporaryParticipants)=>{
-   return await this.groupManager.createNewGroup(groupname,this.loggedinUserId,grouptemporaryParticipants);
-  
-  }
+  };
+
+  saveGroupInfo = async (groupname, grouptemporaryParticipants) => {
+    return await this.groupManager.createNewGroup(
+      groupname,
+      this.loggedinUserId,
+      grouptemporaryParticipants
+    );
+  };
   // Logout user
   logout() {
     localStorage.removeItem(this.loggedinUserId + "_data");
