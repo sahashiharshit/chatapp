@@ -60,7 +60,8 @@ class ChatApp {
       participantList,
       selectedList,
       chat_section,
-      groupDetails
+      groupDetails,
+      userlist
     } = this.cachedElements;
 
     sendMessage.addEventListener("submit", (e) => {
@@ -263,6 +264,7 @@ class ChatApp {
     
     const groupnameText = data.groupname.groupname || "No Group";
     groupName.textContent = groupnameText;
+    groupName.setAttribute("id", `${data.groupname.id}`);
     if (this.messages.length > 0) {
       groupName.setAttribute("id", `${data.groupname.id}`);
     }
