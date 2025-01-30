@@ -188,10 +188,9 @@ class ChatApp {
     chatMessages.innerHTML = "";
     this.messages = data.messages || [];
 
-    const groupnameText = data.groupname || "No Group";
+    const groupnameText = data.groupname.groupname || "No Group";
     groupName.textContent = groupnameText;
-    console.log(data.groupname);
-    console.log(groupnameText);
+    
     if (this.messages.length > 0) {
       groupName.setAttribute("id", `${this.messages[0].group_id}`);
     }
