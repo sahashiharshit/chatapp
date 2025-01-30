@@ -126,6 +126,7 @@ class ChatApp {
     groupName.addEventListener("click", async () => {
 
       const group_id = groupName.getAttribute("id");
+      console.log(group_id);
       if (groupName.innerText == "") {
         return;
       }
