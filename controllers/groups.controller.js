@@ -12,6 +12,8 @@ constructor(){
         try {
         const {groupName, createdBy,groupparticipantsList} = req.body;
             const newgroup = await GroupService.createNewGroup(groupName,createdBy,groupparticipantsList);
+            const io = req.app.get("socketio");
+            io.emit("groupCreated",{groupId:newgroup.id,groupName,members:[createdBy,...groupparticipantsList]});
             res.status(201).json({message:"Group created Succefully",newgroup});
             
         } catch (error) {

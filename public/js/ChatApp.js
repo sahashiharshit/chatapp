@@ -34,7 +34,7 @@ class ChatApp {
 
       participantList: document.querySelector("#participants-list"),
       selectedList: document.querySelector("#selected-participants"),
-      groupName: document.querySelector("#group-name"),
+      groupName: document.querySelector("#groupname"),
       backToChats: document.querySelector("#back-to-chats"),
       groupDetails: document.querySelector("#group-details"),
       chat_section: document.querySelector(".chat-window"),
@@ -115,7 +115,7 @@ class ChatApp {
       selectedList.innerHTML = "";
       participantsInput.value = "";
       this.grouptemporaryParticipants = [];
-      await this.fetchGroups();
+      // await this.fetchGroups();
     });
     backToChats.addEventListener("click", () => {});
     groupName.addEventListener("click", async () => {});
@@ -129,6 +129,13 @@ class ChatApp {
     this.socket.on("newMessage", (data) => {
       if (data.groupId !== this.selectedGroupId) return;
       this.renderInstantMessages(data);
+    });
+    
+    this.socket.on("groupCreated",({groupId,groupName,members})=>{
+    console.log(groupId,groupName,members);
+      if(members.inculdes(this.loggedinUserId)){
+        this.fetchGroups();
+      }
     });
   }
 

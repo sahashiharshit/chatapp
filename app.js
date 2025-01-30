@@ -18,6 +18,7 @@ const io = new Server(server,{
   cors:{origin:'*',},
   
   });
+  app.set("socketio",io);
   socketHandler.handleSocketEvents(io);
 
 
