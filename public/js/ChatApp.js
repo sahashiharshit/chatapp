@@ -308,7 +308,9 @@ class ChatApp {
     const { chatMessages } = this.cachedElements;
     const children = chatMessages.children;
     console.log(children);
-    
+    if(children[0].className=='errornomsg'){
+      chatMessages.innerHTML='';
+    }
     const messageElement = document.createElement("div");
     let date = new Date(message.timestamp);
     let localtime = date.toLocaleString(undefined, {
