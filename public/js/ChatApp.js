@@ -34,6 +34,7 @@ class ChatApp {
       participantList: document.querySelector("#participants-list"),
       selectedList: document.querySelector("#selected-participants"),
       groupName: document.querySelector(".groupname"),
+      newGroupName:document.querySelector('#group-name'),
       userlist : document.querySelector("#user-list"),
       backToChats: document.querySelector("#back-to-chats"),
       groupDetails: document.querySelector("#group-details"),
@@ -55,6 +56,7 @@ class ChatApp {
       backToChats,
       createGroupContainer,
       groupName,
+      newGroupName,
       chatMessages,
       modalOverlay,
       participantList,
@@ -79,7 +81,7 @@ class ChatApp {
     closeCreateGroup.addEventListener("click", () => {
       createGroupContainer.style.display = "none";
       modalOverlay.classList.add("hidden");
-      groupName.value = "";
+      newGroupName.value = "";
 
       selectedList.innerHTML = "";
       participantsInput.innerHTML = "";
@@ -98,8 +100,8 @@ class ChatApp {
 
     createGroupBtn.addEventListener("click", async (e) => {
       e.preventDefault();
-      console.log(groupName.value);
-      const groupname = sanitizeHTML(groupName.value);
+      console.log(newGroupName.value);
+      const groupname = sanitizeHTML(newGroupName.value);
       if (!groupname || this.grouptemporaryParticipants.length === 0) {
         alert("Please provide a group name and add at least one participant.");
         return;
@@ -114,7 +116,7 @@ class ChatApp {
       }
       createGroupContainer.style.display = "none";
       modalOverlay.classList.add("hidden");
-      groupName.value = "";
+      newGroupName.value = "";
       participantList.innerHTML = "";
       selectedList.innerHTML = "";
       participantsInput.value = "";
