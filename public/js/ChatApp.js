@@ -98,7 +98,8 @@ class ChatApp {
 
     createGroupBtn.addEventListener("click", async (e) => {
       e.preventDefault();
-      const groupname = sanitizeHTML(groupName.value.trim());
+      console.log(groupName.value);
+      const groupname = sanitizeHTML(groupName.value);
       if (!groupname || this.grouptemporaryParticipants.length === 0) {
         alert("Please provide a group name and add at least one participant.");
         return;
