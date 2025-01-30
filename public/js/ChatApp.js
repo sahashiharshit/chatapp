@@ -258,12 +258,12 @@ class ChatApp {
     const { chatMessages, groupName } = this.cachedElements;
     chatMessages.innerHTML = "";
     this.messages = data.messages || [];
-
+    console.log(data);
     const groupnameText = data.groupname.groupname || "No Group";
     groupName.textContent = groupnameText;
     console.log(this.messages);
     if (this.messages.length > 0) {
-      groupName.setAttribute("id", `${this.messages[0].group_id}`);
+      groupName.setAttribute("id", ``);
     }
 
     if (this.messages.length === 0) {
