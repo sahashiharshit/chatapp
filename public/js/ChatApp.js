@@ -306,6 +306,9 @@ class ChatApp {
 
   renderInstantMessages(message, scrollToBottom = true) {
     const { chatMessages } = this.cachedElements;
+    const children = chatMessages.children;
+    console.log(children);
+    
     const messageElement = document.createElement("div");
     let date = new Date(message.timestamp);
     let localtime = date.toLocaleString(undefined, {
