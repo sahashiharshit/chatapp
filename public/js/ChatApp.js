@@ -210,7 +210,7 @@ class ChatApp {
     
     this.socket.on("groupCreated",({groupId,groupName,members})=>{
     console.log(groupId,groupName,members);
-    console.log(typeof members);
+   
       if(members.includes(this.loggedinUserId)){
         this.fetchGroups();
       }
